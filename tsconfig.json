@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "types",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": false,
+    "downlevelIteration": true,
+    "noUnusedParameters": true,
+    "outDir": "lib",
+    "rootDir": "src",
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "es5",
+    "baseUrl": "src/types",
+    "typeRoots" : ["src/types", "node_modules/@types"],
+    "lib": [
+      "ES2015",
+      "ES2016",
+      "ES2017",
+      "ES5",
+      "ES6",
+      "ES7",
+      "ESNext",
+      "ES2015.Promise",
+      "ScriptHost"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}
