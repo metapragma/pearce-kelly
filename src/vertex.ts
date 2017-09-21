@@ -209,33 +209,12 @@ export default class Vertex {
     return terminate
   }
 
-  backwardsDepthFirstSearch(callback: (visitedVertex: Vertex) => boolean): boolean {
-    let terminate = false
-
-    if (this.visited === false) {
-      this.visited = true
-
-      const visitedVertex = this
-
-      terminate = callback(visitedVertex)
-
-      if (terminate !== true) {
-          this.immediatePredecessorVertices.some(function(immediatePredecessorVertex) {
-          terminate = immediatePredecessorVertex.backwardsDepthFirstSearch(callback)
-
-          return terminate
-        })
-      }
-    }
-
-    return terminate
-  }
-  
-  // understand how this works
   getForwardsAffectedVertices(sourceVertex: Vertex): Vertex[] {
     const forwardsAffectedVertices: Vertex[] = []
-
-    this.forwardsDepthFirstSearch(function(visitedVertex) {
+    
+    // start DFS-F execution
+    this.forwardsDepthFirstSearch((visitedVertex) => {
+      // called when we reach terminate = callback(visitedVertex)
       const forwardsAffectedVertex = visitedVertex,  
             terminate = (forwardsAffectedVertex === sourceVertex)  
 
@@ -244,31 +223,52 @@ export default class Vertex {
       return terminate
     })
 
-    forwardsAffectedVertices.forEach(function(forwardsAffectedVertex) {
+    forwardsAffectedVertices.forEach((forwardsAffectedVertex) => {
       forwardsAffectedVertex.resetVisited()
     })
 
     return forwardsAffectedVertices
   }
+  
+  // correct logig here
+  
+  // backwardsDepthFirstSearch(callback: (vertex: Vertex) => boolean): boolean {
+  //   let terminate = false
 
-  getBackwardsAffectedVertices(sourceVertex: Vertex): Vertex[] {
-    const backwardsAffectedVertices: Vertex[] = []
+  //   if (this.visited === false) {
+  //     this.visited = true
 
-    this.backwardsDepthFirstSearch((visitedVertex) => {
-      const backwardsAffectedVertex = visitedVertex, 
-              terminate = (backwardsAffectedVertex === sourceVertex)
+  //     const visitedVertex = this  ///
 
-      backwardsAffectedVertices.push(backwardsAffectedVertex)
+  //     terminate = callback(visitedVertex)
 
-      return terminate
-    })
+  //     if (terminate !== true) {
+  //       this.immediatePredecessorVertices.some((immediatePredecessorVertex) => {
+  //         terminate = immediatePredecessorVertex.backwardsDepthFirstSearch(callback)
 
-    backwardsAffectedVertices.forEach(function(backwardsAffectedVertex) {
-      backwardsAffectedVertex.resetVisited()
-    })
+  //         return terminate
+  //       })
+  //     }
+  //   }
 
-    return backwardsAffectedVertices
-  }
+  //   return terminate
+  // }
+
+  // getBackwardsAffectedVertices() {
+  //   const backwardsAffectedVertices: Vertex[] = []
+
+  //   this.backwardsDepthFirstSearch((visitedVertex) => {
+  //     const backwardsAffectedVertex = visitedVertex
+
+  //     backwardsAffectedVertices.push(backwardsAffectedVertex)
+  //   })
+
+  //   backwardsAffectedVertices.forEach(function(backwardsAffectedVertex) {
+  //     backwardsAffectedVertex.resetVisited()
+  //   })
+
+  //   return backwardsAffectedVertices
+  // }
   
   isVertexImmediatePredecessorVertex(vertex: Vertex): boolean {
     return this.immediatePredecessorVertices.includes(vertex)

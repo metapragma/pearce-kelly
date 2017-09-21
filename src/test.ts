@@ -274,4 +274,13 @@ describe("Vertex", () => {
     vertex.removeOutgoingEdges()
     expect(vertex.getImmediateSuccessorVertices()).toEqual([])
   })
+
+  // it("discovers forwards depth-first search affected vertices", () => {
+  //   const v2 = new Vertex('v2', 10, 11, true)
+  //   const v3 = new Vertex('v3', 15, 12, true)
+  //   const v4 = new Vertex('v4', 112, 8, true)
+  //   const v5 = new Vertex('v5', 90, 3, false)
+  //   const vertex = new Vertex('v1', 1, 0, false, [], [v5, v2, v4, v3])
+  //   expect(vertex.getForwardsAffectedVertices(vertex)).toEqual([v2, v3, v4])
+  // })
 })
