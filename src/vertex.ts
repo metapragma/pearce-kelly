@@ -1,24 +1,51 @@
 'use strict'
 
-// import { vertexNamesFromVertices, topologicallyOrderVertices } from './utilities/vertex' 
+const vertexNamesFromVertices = (vertices: Vertex[]) => {
+  const vertexNames = vertices.map((vertex) => {
+    const vertexName = vertex.getName()
 
-// determnine exact value type
-// interface IVertexMap {
-//   [key: string]: any
-// }
+    return vertexName
+  })
+
+  return vertexNames
+}
+
+const topologicallyOrderVertices = (vertices: Vertex[]) => {
+  vertices.sort((firstVertex, secondVertex) => {
+    const firstVertexIndex = firstVertex.getIndex(),
+          secondVertexIndex = secondVertex.getIndex()
+
+    if (firstVertexIndex < secondVertexIndex) {
+      return -1
+    } else {
+      return +1
+    }
+  })
+
+  const topologicallyOrderedVertices = vertices
+  return topologicallyOrderedVertices
+}
+
+export interface IVertexMap {
+  [key: string]: Vertex
+}
 
 export default class Vertex {
+  static fromNameAndIndex(name: string, index: number): Vertex {
+    const immediatePredecessorVertices: Vertex[] = []
+    const immediateSuccessorVertices: Vertex[] = []
+    const dependencyVertex = new Vertex(name, index, false, immediatePredecessorVertices, immediateSuccessorVertices)
+    return dependencyVertex
+  }
+  
   name: string
-  // do we need value here?
-  value: any
   index: number
   visited: boolean
   immediatePredecessorVertices: Vertex[]
   immediateSuccessorVertices: Vertex[]
-  // enforce predessors, succesors?
-  constructor(name: string, value: any, index: number, visited: boolean, immediatePredecessorVertices?: Vertex[], immediateSuccessorVertices?: Vertex[]) {
+
+  constructor(name: string, index: number, visited: boolean, immediatePredecessorVertices: Vertex[], immediateSuccessorVertices: Vertex[]) {
     this.name = name
-    this.value = value
     this.index = index
     this.visited = visited
     this.immediatePredecessorVertices = immediatePredecessorVertices
@@ -29,36 +56,12 @@ export default class Vertex {
     return this.name
   }
 
-  getValue(): any {
-    return this.value
-  }
-
-  getIndex(): number {
+  getIndex(): number  {
     return this.index
   }
 
   isVisited(): boolean {
     return this.visited
-  }
-
-    setName(name: string): void {
-    this.name = name
-  }
-
-  setValue(value: any): void {
-    this.value = value
-  }
-
-  setIndex(index: number): void {
-    this.index = index
-  }
-
-  setVisited(visited: boolean): void {
-    this.visited = visited
-  }
-
-  resetVisited(): void {
-    this.visited = false
   }
 
   getImmediatePredecessorVertices(): Vertex[] {
@@ -69,176 +72,194 @@ export default class Vertex {
     return this.immediateSuccessorVertices
   }
 
-  // test this
-  getPredecessorVertexMap(): object {
-    let predecessorVertexMap: object = {}
-    this.immediatePredecessorVertices.forEach((vertex) => {
-      predecessorVertexMap[vertex.getName()] = vertex.getValue()
+  // check this
+  getPredecessorVertexMap(predecessorVertexMap: IVertexMap = {}) {
+    this.immediatePredecessorVertices.forEach((vertex: Vertex) => {
+      const predecessorVertexName = vertex.getName()
+      predecessorVertexMap[predecessorVertexName] = vertex
+
+      // predecessorVertex.getPredecessorVertices(predecessorVertexMap)
     })
+
     return predecessorVertexMap
-    // this.forEachImmediatePredecessorVertex(function(immediatePredecessorVertex) {
-    //   const predecessorVertex = immediatePredecessorVertex, ///
-    //         predecessorVertexName = predecessorVertex.getName()
-
-    //   predecessorVertexMap[predecessorVertexName] = predecessorVertex
-
-    //   predecessorVertex.getPredecessorVertices(predecessorVertexMap)
-    // })
-
-    // return predecessorVertexMap
   }
 
-  getSuccessorVertexMap(): object {
-    let successorVertexMap: object = {}
-    this.immediateSuccessorVertices.forEach((vertex) => {
-      successorVertexMap[vertex.getName()] = vertex.getValue()
+  getSuccessorVertexMap(successorVertexMap: IVertexMap = {}) {
+    this.immediateSuccessorVertices.forEach((vertex: Vertex) => {
+      const successorVertexName = vertex.getName()
+      successorVertexMap[successorVertexName] = vertex
+
+      // successorVertex.getSuccessorVertices(successorVertexMap)
     })
+
     return successorVertexMap
-    // this.forEachImmediateSuccessorVertex(function(immediateSuccessorVertex) {
-    //   const successorVertex = immediateSuccessorVertex, ///
-    //         successorVertexName = successorVertex.getName()
-
-    //   successorVertexMap[successorVertexName] = successorVertex
-
-    //   successorVertex.getSuccessorVertices(successorVertexMap)
-    // })
-
-    // return successorVertexMap
   }
   
-  getPredecessorVertexNames(): string[] {
+  getPredecessorVertexNames() {
     let predecessorVertexNames: string[] = []
     this.immediatePredecessorVertices.forEach((vertex) => {
       predecessorVertexNames.push(vertex.getName())
     })
     return predecessorVertexNames
-    // const predecessorVertices = this.getPredecessorVertices(),
-    //       predecessorVertexNames = predecessorVertices.map(function(predecessorVertex) {
-    //         const predecessorVertexName = predecessorVertex.getName()
-            
-    //         return predecessorVertexName
-    //       })
-    
-    // return predecessorVertexNames
   }
 
-  getSuccessorVertexNames(): string[] {
+  getSuccessorVertexNames() {
     let successorVertexNames: string[] = []
     this.immediateSuccessorVertices.forEach((vertex) => {
       successorVertexNames.push(vertex.getName())
     })
     return successorVertexNames
-    // const successorVertices = this.getSuccessorVertices(),
-    //       successorVertexNames = successorVertices.map(function(successorVertex) {
-    //       const successorVertexName = successorVertex.getName()
-
-    //       return successorVertexName
-    //     })
-
-    // return successorVertexNames
   }
 
-  getPredecessorVertexValues(): any[] {
-    let predecessorVertexValues: any[] = []
-    this.immediatePredecessorVertices.forEach((vertex) => {
-      predecessorVertexValues.push(vertex.getValue())
-    })
-    return predecessorVertexValues
-    // const predecessorVertexMap = this.getPredecessorVertexMap(),
-    //       predecessorVertexNames = Object.keys(predecessorVertexMap),
-    //       predecessorVertices = predecessorVertexNames.map(function(predecessorVertexName) {
-    //         const predecessorVertex = predecessorVertexMap[predecessorVertexName]
-
-    //         return predecessorVertex
-    //       })
-
-    // return predecessorVertices
+  getPredecessorVertices() {
+    const predecessorVertexMap = this.getPredecessorVertexMap()
+    return Object.keys(predecessorVertexMap).map((vertexName) => predecessorVertexMap[vertexName])
   }
 
-  getSuccessorVertexValues(): any[] {
-    let successorVertexValues: any[] = []
-    this.immediateSuccessorVertices.forEach((vertex) => {
-      successorVertexValues.push(vertex.getValue())
-    })
-    return successorVertexValues
-    // const successorVertexMap = this.getSuccessorVertexMap(),
-    //       successorVertexNames = Object.keys(successorVertexMap),
-    //       successorVertices = successorVertexNames.map(function(successorVertexName) {
-    //         const successorVertex = successorVertexMap[successorVertexName]
+  getSuccessorVertices() {
+    const successorVertexMap = this.getSuccessorVertexMap()
+    return Object.keys(successorVertexMap).map((vertexName) => successorVertexMap[vertexName])
+  }
+
+  getTopologicallyOrderedPredecessorVertexNames() {
+    return vertexNamesFromVertices(topologicallyOrderVertices(this.getPredecessorVertices()))
+  }
   
-    //         return successorVertex
-    //       })
+  // getForwardsAffectedVertices(sourceVertex) {
+  //   const forwardsAffectedVertices = []
 
-    // return successorVertices
-  }
+  //   this.forwardsDepthFirstSearch(function(visitedVertex) {
+  //     const forwardsAffectedVertex = visitedVertex,  
+  //           terminate = (forwardsAffectedVertex === sourceVertex)  
 
-  // getTopologicallyOrderedPredecessorVertexNames() {
-  //   const predecessorVertices = this.getPredecessorVertices()
+  //     forwardsAffectedVertices.push(forwardsAffectedVertex)
 
-  //   topologicallyOrderVertices(predecessorVertices)
+  //     return terminate
+  //   })
 
-  //   const topologicallyOrderedPredecessorVertices = predecessorVertices,  ///
-  //         topologicallyOrderedPredecessorVertexNames = vertexNamesFromVertices(topologicallyOrderedPredecessorVertices)
+  //   forwardsAffectedVertices.forEach(function(forwardsAffectedVertex) {
+  //     forwardsAffectedVertex.resetVisited()
+  //   })
 
-  //   return topologicallyOrderedPredecessorVertexNames
+  //   return forwardsAffectedVertices
   // }
 
-  forwardsDepthFirstSearch(callback: (visitedVertex: Vertex) => boolean): boolean {
-    // start DFS on successor vertices
-    let terminate = false
-    // if successor node is not visited yet
-    if (this.visited === false) {
-      // set visited to true
-      this.visited = true
-      // afterwards this refers to successor node
-      const visitedVertex = this
-      // perform the callback which will return true or false
-      terminate = callback(visitedVertex)
-      // if true, return true and halt
-      // if false, successor node itself has successor nodes
-      if (terminate !== true) {
-        // perform DFS on some successor node of current successor node
-        this.immediateSuccessorVertices.some((vertex) => {
-          terminate = vertex.forwardsDepthFirstSearch(callback)
-          // do this recursively until terminate returns true
-          return terminate
-        })
-      }
-    }
+  // getBackwardsAffectedVertices() {
+  //   const backwardsAffectedVertices = []
 
-    return terminate
+  //   this.backwardsDepthFirstSearch(function(visitedVertex) {
+  //     const backwardsAffectedVertex = visitedVertex  
+
+  //     backwardsAffectedVertices.push(backwardsAffectedVertex)
+  //   })
+
+  //   backwardsAffectedVertices.forEach(function(backwardsAffectedVertex) {
+  //     backwardsAffectedVertex.resetVisited()
+  //   })
+
+  //   return backwardsAffectedVertices
+  // }
+  
+  isVertexImmediatePredecessorVertex(vertex: Vertex) {
+    return this.immediatePredecessorVertices.includes(vertex)
   }
 
-  getForwardsAffectedVertices(sourceVertex: Vertex): Vertex[] {
-    const forwardsAffectedVertices: Vertex[] = []
+  isVertexImmediateSuccessorVertex(vertex: Vertex) {
+    return this.immediateSuccessorVertices.includes(vertex)
+  }
+
+  isEdgePresentBySourceVertex(sourceVertex: Vertex) {
+    return this.isVertexImmediatePredecessorVertex(sourceVertex)
+  }
+
+  isEdgePresentByTargetVertex(targetVertex: Vertex) {
+    return this.isVertexImmediateSuccessorVertex(targetVertex)
+  }
+
+  setName(name: string) {
+    this.name = name
+  }
+
+  setIndex(index: number) {
+    this.index = index
+  }
+
+  setVisited(visited: boolean) {
+    this.visited = visited
+  }
+
+  removeImmediatePredecessorVertex(vertex: Vertex) {
+    const index = this.immediatePredecessorVertices.indexOf(vertex)
+    this.immediatePredecessorVertices.splice(index, 1)
+  }
+
+  removeImmediateSuccessorVertex(immediateSuccessorVertex: Vertex) {
+    const index = this.immediateSuccessorVertices.indexOf(immediateSuccessorVertex)
+    this.immediateSuccessorVertices.splice(index, 1)
+  }
+  
+  // TODO: solve circular reference
+  removeIncomingEdges() {
+    const immediateSuccessorVertex = this 
     
-    // start DFS-F execution
-    this.forwardsDepthFirstSearch((visitedVertex) => {
-      // called when we reach terminate = callback(visitedVertex)
-      const forwardsAffectedVertex = visitedVertex,  
-            terminate = (forwardsAffectedVertex === sourceVertex)  
+    // this.immediatePredecessorVertices.forEach(function(immediatePredecessorVertex) {
+    //   immediatePredecessorVertex.removeImmediateSuccessorVertex(immediateSuccessorVertex)
+    // })
 
-      forwardsAffectedVertices.push(forwardsAffectedVertex)
+    this.immediatePredecessorVertices = []
+  }
 
-      return terminate
-    })
+  removeOutgoingEdges() {
+    const immediatePredecessorVertex = this 
 
-    forwardsAffectedVertices.forEach((forwardsAffectedVertex) => {
-      forwardsAffectedVertex.resetVisited()
-    })
+    // this.immediateSuccessorVertices.forEach(function(immediateSuccessorVertex) {
+    //   immediateSuccessorVertex.removeImmediateSuccessorVertex(immediatePredecessorVertex)
+    // })
 
-    return forwardsAffectedVertices
+    this.immediateSuccessorVertices = []
+  }
+
+  resetVisited() {
+    this.visited = false
+  }
+
+  addImmediatePredecessorVertex(vertex: Vertex) {
+    this.immediatePredecessorVertices.push(vertex)
+  }
+
+  addImmediateSuccessorVertex(vertex: Vertex) {
+    this.immediateSuccessorVertices.push(vertex)
   }
   
-  // correct logig here
-  
-  // backwardsDepthFirstSearch(callback: (vertex: Vertex) => boolean): boolean {
+  // forwardsDepthFirstSearch(callback) {
   //   let terminate = false
 
   //   if (this.visited === false) {
   //     this.visited = true
 
-  //     const visitedVertex = this  ///
+  //     const visitedVertex = this  
+
+  //     terminate = callback(visitedVertex)
+
+  //     if (terminate !== true) {
+  //       this.immediateSuccessorVertices.some((immediateSuccessorVertex) => {
+  //         terminate = immediateSuccessorVertex.forwardsDepthFirstSearch(callback)
+
+  //         return terminate
+  //       })
+  //     }
+  //   }
+
+  //   return terminate
+  // }
+
+  // backwardsDepthFirstSearch(callback) {
+  //   let terminate = false
+
+  //   if (this.visited === false) {
+  //     this.visited = true
+
+  //     const visitedVertex = this  
 
   //     terminate = callback(visitedVertex)
 
@@ -253,90 +274,4 @@ export default class Vertex {
 
   //   return terminate
   // }
-
-  // getBackwardsAffectedVertices() {
-  //   const backwardsAffectedVertices: Vertex[] = []
-
-  //   this.backwardsDepthFirstSearch((visitedVertex) => {
-  //     const backwardsAffectedVertex = visitedVertex
-
-  //     backwardsAffectedVertices.push(backwardsAffectedVertex)
-  //   })
-
-  //   backwardsAffectedVertices.forEach(function(backwardsAffectedVertex) {
-  //     backwardsAffectedVertex.resetVisited()
-  //   })
-
-  //   return backwardsAffectedVertices
-  // }
-  
-  isVertexImmediatePredecessorVertex(vertex: Vertex): boolean {
-    return this.immediatePredecessorVertices.includes(vertex)
-  }
-
-  isVertexImmediateSuccessorVertex(vertex: Vertex): boolean {
-    return this.immediateSuccessorVertices.includes(vertex)
-  }
-
-  isEdgePresentBySourceVertex(vertex: Vertex): boolean {
-    return this.isVertexImmediatePredecessorVertex(vertex)
-  }
-
-  isEdgePresentByTargetVertex(vertex: Vertex): boolean {
-    return this.isVertexImmediateSuccessorVertex(vertex)
-  }
-
-  addImmediatePredecessorVertex(vertex: Vertex): void {
-    this.immediatePredecessorVertices.push(vertex)
-  }
-
-  addImmediateSuccessorVertex(vertex: Vertex): void {
-    this.immediateSuccessorVertices.push(vertex)
-  }
-
-  removeImmediatePredecessorVertex(vertex: Vertex): void {
-    const index = this.immediatePredecessorVertices.indexOf(vertex)
-    this.immediatePredecessorVertices.splice(index, 1)
-  }
-
-  removeImmediateSuccessorVertex(immediateSuccessorVertex: Vertex): void {
-    const index = this.immediateSuccessorVertices.indexOf(immediateSuccessorVertex)
-    this.immediateSuccessorVertices.splice(index, 1)
-  }
-  
-  removeIncomingEdges(): void {
-    // remove current vertex from successors list of predecessor vertices
-    const immediateSuccessorVertex = this
-    // circular reference
-    // this.immediatePredecessorVertices.forEach((vertex) => {
-    //   vertex.removeImmediateSuccessorVertex(immediateSuccessorVertex)
-    // })
-    // remove predecessor vertices of current vertex
-    this.immediatePredecessorVertices = []
-  }
-
-  removeOutgoingEdges() {
-    // same logic on successors
-    const immediatePredecessorVertex = this
-    // circular reference problem
-    // this.immediateSuccessorVertices.forEach((vertex) => {
-    //   vertex.removeImmediateSuccessorVertex(immediatePredecessorVertex)
-    // })
-    this.immediateSuccessorVertices = []
-  }
-
-  static fromNameAndIndex(name: string, value: any, index: number) {
-    const visited = false,
-          immediatePredecessorVertices: Vertex[] = [],
-          immediateSuccessorVertices: Vertex[] = [],
-          dependencyVertex = new Vertex(name, value, index, visited, immediatePredecessorVertices, immediateSuccessorVertices)
-
-    return dependencyVertex
-  }
 }
-
-////
-// implement automatic predecessor and successor discovery (avoiding circular reference)
-
-// let vertex = new Vertex()
-// export default vertex
