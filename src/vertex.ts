@@ -1,6 +1,6 @@
 'use strict'
 
-const vertexNamesFromVertices = (vertices: Vertex[]) => {
+export const vertexNamesFromVertices = (vertices: Vertex[]) => {
   const vertexNames = vertices.map((vertex) => {
     const vertexName = vertex.getName()
 
@@ -10,7 +10,7 @@ const vertexNamesFromVertices = (vertices: Vertex[]) => {
   return vertexNames
 }
 
-const topologicallyOrderVertices = (vertices: Vertex[]) => {
+export const topologicallyOrderVertices = (vertices: Vertex[]) => {
   vertices.sort((firstVertex, secondVertex) => {
     const firstVertexIndex = firstVertex.getIndex(),
           secondVertexIndex = secondVertex.getIndex()
@@ -30,7 +30,7 @@ export interface IVertexMap {
   [key: string]: Vertex
 }
 
-export default class Vertex {
+export class Vertex {
   static fromNameAndIndex(name: string, index: number): Vertex {
     const immediatePredecessorVertices: Vertex[] = []
     const immediateSuccessorVertices: Vertex[] = []
@@ -275,3 +275,6 @@ export default class Vertex {
   //   return terminate
   // }
 }
+
+// add private, public
+// getter/setter

@@ -1,8 +1,9 @@
 'use strict'
 
-// import DirectedAcyclicGraph from './directedAcyclicGraph'
+import { Vertex } from '../vertex'
+import Edge from '../edge'
+import DirectedAcyclicGraph from '../directedAcyclicGraph'
 
-import Vertex from '../vertex'
 import mocha = require('mocha')
 import expect = require('expect')
 
@@ -225,5 +226,21 @@ describe("Vertex", () => {
     const vertex = new Vertex('vertex', 1, false, [v2, v3], [v4])
     vertex.addImmediateSuccessorVertex(v5)
     expect(vertex.getSuccessorVertices()).toEqual([v4, v5])
+  })
+})
+
+describe("Edge", () => {
+  it("gets its source vertex", () => {
+    const v1 = new Vertex('v1', 1, false, [], [])
+    const v2 = new Vertex('v2', 2, false, [], [])
+    const edge = new Edge('v1', 'v2')
+    expect(edge.getSourceVertexName()).toEqual('v1')
+  })
+
+  it("gets its target vertex", () => {
+    const v1 = new Vertex('v1', 1, false, [], [])
+    const v2 = new Vertex('v2', 2, false, [], [])
+    const edge = new Edge('v1', 'v2')
+    expect(edge.getTargetVertexName()).toEqual('v2')
   })
 })

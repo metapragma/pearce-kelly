@@ -15,8 +15,4 @@ export default class Edge {
   getTargetVertexName(): string {
     return this.targetVertexName
   }
-  
-  isEqualTo(edge: Edge) {
-    return (this.sourceVertexName === edge.getSourceVertexName() && this.targetVertexName === edge.getTargetVertexName())
-  }
 }
