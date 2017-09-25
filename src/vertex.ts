@@ -10,10 +10,10 @@ export const vertexNamesFromVertices = (vertices: Vertex[]) => {
   return vertexNames
 }
 
-export const topologicallyOrderVertices = (vertices: Vertex[]) => {
+export const topologicallyOrderVertices = (vertices: Vertex[]): Vertex[] => {
   vertices.sort((firstVertex, secondVertex) => {
-    const firstVertexIndex = firstVertex.getIndex(),
-          secondVertexIndex = secondVertex.getIndex()
+    const firstVertexIndex = firstVertex.getIndex()
+    const secondVertexIndex = secondVertex.getIndex()
 
     if (firstVertexIndex < secondVertexIndex) {
       return -1
@@ -22,8 +22,7 @@ export const topologicallyOrderVertices = (vertices: Vertex[]) => {
     }
   })
 
-  const topologicallyOrderedVertices = vertices
-  return topologicallyOrderedVertices
+  return vertices
 }
 
 export interface IVertexMap {
@@ -125,40 +124,40 @@ export class Vertex {
     return vertexNamesFromVertices(topologicallyOrderVertices(this.getPredecessorVertices()))
   }
   
-  // getForwardsAffectedVertices(sourceVertex) {
-  //   const forwardsAffectedVertices = []
+  getForwardsAffectedVertices(sourceVertex) {
+    const forwardsAffectedVertices = []
 
-  //   this.forwardsDepthFirstSearch(function(visitedVertex) {
-  //     const forwardsAffectedVertex = visitedVertex,  
-  //           terminate = (forwardsAffectedVertex === sourceVertex)  
+    this.forwardsDepthFirstSearch((visitedVertex) => {
+      const forwardsAffectedVertex = visitedVertex  
+      const terminate = (forwardsAffectedVertex === sourceVertex)  
 
-  //     forwardsAffectedVertices.push(forwardsAffectedVertex)
+      forwardsAffectedVertices.push(forwardsAffectedVertex)
 
-  //     return terminate
-  //   })
+      return terminate
+    })
 
-  //   forwardsAffectedVertices.forEach(function(forwardsAffectedVertex) {
-  //     forwardsAffectedVertex.resetVisited()
-  //   })
+    forwardsAffectedVertices.forEach((forwardsAffectedVertex) => {
+      forwardsAffectedVertex.resetVisited()
+    })
 
-  //   return forwardsAffectedVertices
-  // }
+    return forwardsAffectedVertices
+  }
 
-  // getBackwardsAffectedVertices() {
-  //   const backwardsAffectedVertices = []
+  getBackwardsAffectedVertices() {
+    const backwardsAffectedVertices = []
 
-  //   this.backwardsDepthFirstSearch(function(visitedVertex) {
-  //     const backwardsAffectedVertex = visitedVertex  
+    this.backwardsDepthFirstSearch((visitedVertex) => {
+      const backwardsAffectedVertex = visitedVertex  
 
-  //     backwardsAffectedVertices.push(backwardsAffectedVertex)
-  //   })
+      backwardsAffectedVertices.push(backwardsAffectedVertex)
+    })
 
-  //   backwardsAffectedVertices.forEach(function(backwardsAffectedVertex) {
-  //     backwardsAffectedVertex.resetVisited()
-  //   })
+    backwardsAffectedVertices.forEach((backwardsAffectedVertex) => {
+      backwardsAffectedVertex.resetVisited()
+    })
 
-  //   return backwardsAffectedVertices
-  // }
+    return backwardsAffectedVertices
+  }
   
   isVertexImmediatePredecessorVertex(vertex: Vertex) {
     return this.immediatePredecessorVertices.includes(vertex)
@@ -231,49 +230,49 @@ export class Vertex {
     this.immediateSuccessorVertices.push(vertex)
   }
   
-  // forwardsDepthFirstSearch(callback) {
-  //   let terminate = false
+  forwardsDepthFirstSearch(callback) {
+    let terminate = false
 
-  //   if (this.visited === false) {
-  //     this.visited = true
+    if (this.visited === false) {
+      this.visited = true
 
-  //     const visitedVertex = this  
+      const visitedVertex = this  
 
-  //     terminate = callback(visitedVertex)
+      terminate = callback(visitedVertex)
 
-  //     if (terminate !== true) {
-  //       this.immediateSuccessorVertices.some((immediateSuccessorVertex) => {
-  //         terminate = immediateSuccessorVertex.forwardsDepthFirstSearch(callback)
+      if (terminate !== true) {
+        this.immediateSuccessorVertices.some((immediateSuccessorVertex) => {
+          terminate = immediateSuccessorVertex.forwardsDepthFirstSearch(callback)
 
-  //         return terminate
-  //       })
-  //     }
-  //   }
+          return terminate
+        })
+      }
+    }
 
-  //   return terminate
-  // }
+    return terminate
+  }
 
-  // backwardsDepthFirstSearch(callback) {
-  //   let terminate = false
+  backwardsDepthFirstSearch(callback) {
+    let terminate = false
 
-  //   if (this.visited === false) {
-  //     this.visited = true
+    if (this.visited === false) {
+      this.visited = true
 
-  //     const visitedVertex = this  
+      const visitedVertex = this  
 
-  //     terminate = callback(visitedVertex)
+      terminate = callback(visitedVertex)
 
-  //     if (terminate !== true) {
-  //       this.immediatePredecessorVertices.some((immediatePredecessorVertex) => {
-  //         terminate = immediatePredecessorVertex.backwardsDepthFirstSearch(callback)
+      if (terminate !== true) {
+        this.immediatePredecessorVertices.some((immediatePredecessorVertex) => {
+          terminate = immediatePredecessorVertex.backwardsDepthFirstSearch(callback)
 
-  //         return terminate
-  //       })
-  //     }
-  //   }
+          return terminate
+        })
+      }
+    }
 
-  //   return terminate
-  // }
+    return terminate
+  }
 }
 
 // add private, public
