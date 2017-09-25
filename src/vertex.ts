@@ -124,10 +124,10 @@ export class Vertex {
     return vertexNamesFromVertices(topologicallyOrderVertices(this.getPredecessorVertices()))
   }
   
-  getForwardsAffectedVertices(sourceVertex) {
-    const forwardsAffectedVertices = []
+  getForwardsAffectedVertices(sourceVertex: Vertex): Vertex[] {
+    const forwardsAffectedVertices: Vertex[] = []
 
-    this.forwardsDepthFirstSearch((visitedVertex) => {
+    this.forwardsDepthFirstSearch((visitedVertex: Vertex): boolean => {
       const forwardsAffectedVertex = visitedVertex  
       const terminate = (forwardsAffectedVertex === sourceVertex)  
 
@@ -143,13 +143,38 @@ export class Vertex {
     return forwardsAffectedVertices
   }
 
-  getBackwardsAffectedVertices() {
-    const backwardsAffectedVertices = []
+  private forwardsDepthFirstSearch(callback: (visitedVertex: Vertex) => boolean): boolean {
+    let terminate = false
+
+    if (this.visited === false) {
+      this.visited = true
+
+      const visitedVertex = this  
+
+      terminate = callback(visitedVertex)
+
+      if (terminate !== true) {
+        this.immediateSuccessorVertices.some((immediateSuccessorVertex) => {
+          terminate = immediateSuccessorVertex.forwardsDepthFirstSearch(callback)
+
+          return terminate
+        })
+      }
+    }
+
+    return terminate
+  }
+
+  getBackwardsAffectedVertices(): Vertex[] {
+    const backwardsAffectedVertices: Vertex[] = []
 
     this.backwardsDepthFirstSearch((visitedVertex) => {
-      const backwardsAffectedVertex = visitedVertex  
-
-      backwardsAffectedVertices.push(backwardsAffectedVertex)
+      if (visitedVertex === undefined || visitedVertex === null) return false
+      else {
+        const backwardsAffectedVertex = visitedVertex  
+        backwardsAffectedVertices.push(backwardsAffectedVertex)
+        return true
+      }
     })
 
     backwardsAffectedVertices.forEach((backwardsAffectedVertex) => {
@@ -157,6 +182,28 @@ export class Vertex {
     })
 
     return backwardsAffectedVertices
+  }
+
+  backwardsDepthFirstSearch(callback: (visitedVertex: Vertex) => boolean): boolean {
+    let terminate = false
+
+    if (this.visited === false) {
+      this.visited = true
+
+      const visitedVertex = this  
+
+      terminate = callback(visitedVertex)
+
+      if (terminate !== true) {
+        this.immediatePredecessorVertices.some((immediatePredecessorVertex) => {
+          terminate = immediatePredecessorVertex.backwardsDepthFirstSearch(callback)
+
+          return terminate
+        })
+      }
+    }
+
+    return terminate
   }
   
   isVertexImmediatePredecessorVertex(vertex: Vertex) {
@@ -201,9 +248,9 @@ export class Vertex {
   removeIncomingEdges() {
     const immediateSuccessorVertex = this 
     
-    // this.immediatePredecessorVertices.forEach(function(immediatePredecessorVertex) {
-    //   immediatePredecessorVertex.removeImmediateSuccessorVertex(immediateSuccessorVertex)
-    // })
+    this.immediatePredecessorVertices.forEach(function(immediatePredecessorVertex) {
+      immediatePredecessorVertex.removeImmediateSuccessorVertex(immediateSuccessorVertex)
+    })
 
     this.immediatePredecessorVertices = []
   }
@@ -211,9 +258,9 @@ export class Vertex {
   removeOutgoingEdges() {
     const immediatePredecessorVertex = this 
 
-    // this.immediateSuccessorVertices.forEach(function(immediateSuccessorVertex) {
-    //   immediateSuccessorVertex.removeImmediateSuccessorVertex(immediatePredecessorVertex)
-    // })
+    this.immediateSuccessorVertices.forEach(function(immediateSuccessorVertex) {
+      immediateSuccessorVertex.removeImmediateSuccessorVertex(immediatePredecessorVertex)
+    })
 
     this.immediateSuccessorVertices = []
   }
@@ -229,51 +276,8 @@ export class Vertex {
   addImmediateSuccessorVertex(vertex: Vertex) {
     this.immediateSuccessorVertices.push(vertex)
   }
-  
-  forwardsDepthFirstSearch(callback) {
-    let terminate = false
-
-    if (this.visited === false) {
-      this.visited = true
-
-      const visitedVertex = this  
-
-      terminate = callback(visitedVertex)
-
-      if (terminate !== true) {
-        this.immediateSuccessorVertices.some((immediateSuccessorVertex) => {
-          terminate = immediateSuccessorVertex.forwardsDepthFirstSearch(callback)
-
-          return terminate
-        })
-      }
-    }
-
-    return terminate
-  }
-
-  backwardsDepthFirstSearch(callback) {
-    let terminate = false
-
-    if (this.visited === false) {
-      this.visited = true
-
-      const visitedVertex = this  
-
-      terminate = callback(visitedVertex)
-
-      if (terminate !== true) {
-        this.immediatePredecessorVertices.some((immediatePredecessorVertex) => {
-          terminate = immediatePredecessorVertex.backwardsDepthFirstSearch(callback)
-
-          return terminate
-        })
-      }
-    }
-
-    return terminate
-  }
 }
 
 // add private, public
 // getter/setter
+// to circumvent circular reference, immediateVertices should be readonly

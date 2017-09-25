@@ -23,6 +23,7 @@ export default class DirectedAcyclicGraph {
   }
 
   // check return union type
+  // test fails
   getVertexByVertexName(vertexName: string): Vertex | null {
     if (this.isVertexPresentByVertexName(vertexName) === true) {
       return this.vertexMap[vertexName]
@@ -40,7 +41,7 @@ export default class DirectedAcyclicGraph {
   }
 
   isEmpty(): boolean {
-    return this.getVertexValues.length === 0
+    return this.getVertexValues().length === 0
   }
 
   isEdgePresent(edge: Edge): boolean {
@@ -88,12 +89,16 @@ export default class DirectedAcyclicGraph {
   }
   
   // type of cyclic names
-  addEdge(edge: Edge) {
-    const sourceVertexName = edge.getSourceVertexName(),
-      targetVertexName = edge.getTargetVertexName(),
-      cyclicVertexNames = this.addEdgeByVertexNames(sourceVertexName, targetVertexName)
+  addEdge(edge: Edge): string[] {
+    const sourceVertexName = edge.getSourceVertexName()
+    const targetVertexName = edge.getTargetVertexName()
+    const cyclicVertexNames = this.addEdgeByVertexNames(sourceVertexName, targetVertexName)
 
     return cyclicVertexNames
+  }
+
+  removeEdge(edge: Edge): void {
+    this.removeEdgeByVertexNames(edge.getSourceVertexName(), edge.getTargetVertexName())
   }
 
   addEdgeByVertexNames(sourceVertexName: string, targetVertexName: string): string[] {
@@ -156,10 +161,6 @@ export default class DirectedAcyclicGraph {
     return removedEdges
   }
 
-  removeEdge(edge: Edge): void {
-    this.removeEdgeByVertexNames(edge.getSourceVertexName(), edge.getTargetVertexName())
-  }
-
   removeEdgeByVertexNames(sourceVertexName: string, targetVertexName: string): void {
     const edgePresent = this.isEdgePresentByVertexNames(sourceVertexName, targetVertexName)
     if (edgePresent) {
@@ -187,7 +188,7 @@ export default class DirectedAcyclicGraph {
   }
   
   // 'last' method from package necessary
-  validateEdgeByVertices(sourceVertex: Vertex, targetVertex: Vertex) {
+  validateEdgeByVertices(sourceVertex: Vertex, targetVertex: Vertex): Vertex[] {
     let cyclicVertices = null
 
     const forwardsAffectedVertices = targetVertex.getForwardsAffectedVertices(sourceVertex)
@@ -203,18 +204,15 @@ export default class DirectedAcyclicGraph {
 
       topologicallyOrderVertices(forwardsAffectedVertices)
 
-      const affectedVertices = [].concat(backwardsAffectedVertices).concat(forwardsAffectedVertices),
-        affectedVertexIndices = affectedVertices.map((affectedVertex) => {
-          const affectedVertexIndex = affectedVertex.getIndex()
-
-          return affectedVertexIndex
-        })
+      const affectedVertices = [].concat(backwardsAffectedVertices).concat(forwardsAffectedVertices)
+      const affectedVertexIndices = affectedVertices.map((affectedVertex) => {
+        return affectedVertex.getIndex()
+      })
 
       affectedVertexIndices.sort()
 
       affectedVertices.forEach((affectedVertex, index) => {
         const affectedVertexIndex = affectedVertexIndices[index]
-
         affectedVertex.setIndex(affectedVertexIndex)
       })
     }
@@ -234,14 +232,14 @@ export default class DirectedAcyclicGraph {
     return directedAcyclicGraph
   }
 
-  static fromTopologicallyOrderedVertices(topologicallyOrderedVertices: Vertex[]): DirectedAcyclicGraph {
-    const vertexMap: IVertexMap = vertexMapFromTopologicallyOrderedVertices(topologicallyOrderedVertices)
+  // static fromTopologicallyOrderedVertices(topologicallyOrderedVertices: Vertex[]): DirectedAcyclicGraph {
+  //   const vertexMap: IVertexMap = vertexMapFromTopologicallyOrderedVertices(topologicallyOrderedVertices)
 
-    addEdgesToVertices(topologicallyOrderedVertices, vertexMap)
+  //   addEdgesToVertices(topologicallyOrderedVertices, vertexMap)
 
-    const directedAcyclicGraph = new DirectedAcyclicGraph(vertexMap)
-    return directedAcyclicGraph
-  }
+  //   const directedAcyclicGraph = new DirectedAcyclicGraph(vertexMap)
+  //   return directedAcyclicGraph
+  // }
 }
 
 const vertexMapFromVertexNames = (vertexNames: string[]): IVertexMap => {
@@ -269,20 +267,20 @@ const vertexMapFromTopologicallyOrderedVertices = (topologicallyOrderedVertices:
   return vertexMap
 }
 
-const addEdgesToVertices = (topologicallyOrderedVertices: Vertex[], vertexMap: IVertexMap): void => {
-  topologicallyOrderedVertices.forEach((topologicallyOrderedVertex) => {
-    topologicallyOrderedVertex.forEachOutgoingEdge((outgoingEdge: Edge) => {
-      const sourceVertexName = outgoingEdge.getSourceVertexName(),
-        targetVertexName = outgoingEdge.getTargetVertexName(),
-        immediatePredecessorVertexName = sourceVertexName,  ///
-        immediateSuccessorVertexName = targetVertexName,
-        immediatePredecessorVertex = vertexMap[immediatePredecessorVertexName], ///
-        immediateSuccessorVertex = vertexMap[immediateSuccessorVertexName] ///
+// const addEdgesToVertices = (topologicallyOrderedVertices: Vertex[], vertexMap: IVertexMap): void => {
+//   topologicallyOrderedVertices.forEach((topologicallyOrderedVertex) => {
+//     topologicallyOrderedVertex.forEachOutgoingEdge((outgoingEdge: Edge) => {
+//       const sourceVertexName = outgoingEdge.getSourceVertexName(),
+//         targetVertexName = outgoingEdge.getTargetVertexName(),
+//         immediatePredecessorVertexName = sourceVertexName,  ///
+//         immediateSuccessorVertexName = targetVertexName,
+//         immediatePredecessorVertex = vertexMap[immediatePredecessorVertexName], ///
+//         immediateSuccessorVertex = vertexMap[immediateSuccessorVertexName] ///
 
-      immediatePredecessorVertex.addImmediateSuccessorVertex(immediateSuccessorVertex)
+//       immediatePredecessorVertex.addImmediateSuccessorVertex(immediateSuccessorVertex)
 
-      immediateSuccessorVertex.addImmediatePredecessorVertex(immediatePredecessorVertex)
-    })
-  })
-}
+//       immediateSuccessorVertex.addImmediatePredecessorVertex(immediatePredecessorVertex)
+//     })
+//   })
+// }
 
