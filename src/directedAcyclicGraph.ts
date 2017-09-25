@@ -98,7 +98,7 @@ export default class DirectedAcyclicGraph {
   }
 
   removeEdge(edge: Edge): void {
-    this.removeEdgeByVertexNames(edge.getSourceVertexName(), edge.getTargetVertexName())
+    return this.removeEdgeByVertexNames(edge.getSourceVertexName(), edge.getTargetVertexName())
   }
 
   addEdgeByVertexNames(sourceVertexName: string, targetVertexName: string): string[] {
@@ -283,4 +283,6 @@ const vertexMapFromTopologicallyOrderedVertices = (topologicallyOrderedVertices:
 //     })
 //   })
 // }
+
+// TODO: readable error logs
 

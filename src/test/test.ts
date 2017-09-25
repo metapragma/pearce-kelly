@@ -383,6 +383,36 @@ describe("Directed Acyclic Graph", () => {
     expect(dag.getSuccessorVertexNamesByVertexName('v3')).toEqual(['v2'])
   })
 
+  it("adds vertex by vertex names", () => {
+    const dag = DirectedAcyclicGraph.fromNothing()
+    const v2 = new Vertex('v2', 2, false, [], [])
+    expect(dag.isEmpty()).toBe(true)
+    dag.addVertexByVertexName('v2')
+    expect(dag.getVertexNames()).toEqual(['v2'])
+  })
+
+  it("adds edge", () => {
+    const dag = DirectedAcyclicGraph.fromNothing()
+    const v2 = new Vertex('v2', 2, false, [], [])
+    const v3 = new Vertex('v3', 3, false, [], [])
+    const edge = new Edge('v3', 'v2')
+    expect(dag.isEmpty()).toBe(true)
+    dag.addEdge(edge)
+    expect(dag.isEdgePresent(edge)).toBe(true)
+  })
+
+  it("removes edge", () => {
+    const dag = DirectedAcyclicGraph.fromNothing()
+    const v2 = new Vertex('v2', 2, false, [], [])
+    const v3 = new Vertex('v3', 3, false, [], [])
+    const edge = new Edge('v3', 'v2')
+    expect(dag.isEmpty()).toBe(true)
+    dag.addEdge(edge)
+    expect(dag.isEdgePresent(edge)).toBe(true)
+    dag.removeEdge(edge)
+    expect(dag.isEdgePresent(edge)).toBe(false)
+  })
+
   it("adds edge by vertex names", () => {
     const dag = DirectedAcyclicGraph.fromNothing()
     const v2 = new Vertex('v2', 2, false, [], [])
@@ -402,4 +432,43 @@ describe("Directed Acyclic Graph", () => {
     dag.removeEdgeByVertexNames('v3', 'v2')
     expect(dag.isEdgePresentByVertexNames('v3', 'v2')).toBe(false)
   })
+
+  it("removes edges of a source vertex name", () => {
+    const dag = DirectedAcyclicGraph.fromNothing()
+    const v2 = new Vertex('v2', 2, false, [], [])
+    const v3 = new Vertex('v3', 3, false, [], [])
+    const v4 = new Vertex('v4', 4, false, [], [])
+    dag.addEdgeByVertexNames('v2', 'v4')
+    dag.addEdgeByVertexNames('v2', 'v3')
+    expect(dag.isEdgePresentByVertexNames('v2', 'v3')).toEqual(true)
+    expect(dag.isEdgePresentByVertexNames('v2', 'v4')).toEqual(true)
+    dag.removeEdgesBySourceVertexName('v2')
+    expect(dag.isEdgePresentByVertexNames('v2', 'v3')).toEqual(false)
+    expect(dag.isEdgePresentByVertexNames('v2', 'v4')).toEqual(false)
+  })
+
+  it("removes edges of a target vertex name", () => {
+    const dag = DirectedAcyclicGraph.fromNothing()
+    const v2 = new Vertex('v2', 2, false, [], [])
+    const v3 = new Vertex('v3', 3, false, [], [])
+    const v4 = new Vertex('v4', 4, false, [], [])
+    dag.addEdgeByVertexNames('v3', 'v2')
+    dag.addEdgeByVertexNames('v4', 'v2')
+    expect(dag.isEdgePresentByVertexNames('v3', 'v2')).toEqual(true)
+    expect(dag.isEdgePresentByVertexNames('v4', 'v2')).toEqual(true)
+    dag.removeEdgesByTargetVertexName('v2')
+    expect(dag.isEdgePresentByVertexNames('v3', 'v2')).toEqual(false)
+    expect(dag.isEdgePresentByVertexNames('v4', 'v2')).toEqual(false)
+  })
+
+  // TODO: DFS
+  // it("validates edge by vertices", () => {
+  //   const dag = DirectedAcyclicGraph.fromNothing()
+  //   const v2 = new Vertex('v2', 2, false, [], [])
+  //   const v3 = new Vertex('v3', 3, false, [], [])
+  //   const edge = new Edge('v3', 'v2')
+  //   expect(dag.isEmpty()).toBe(true)
+  //   dag.addEdge(edge)
+  //   expect(dag.isEdgePresent(edge)).toBe(true)
+  // })
 })
