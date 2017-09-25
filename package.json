@@ -24,8 +24,6 @@
     "chokidar-cli": "^1.2.0",
     "expect": "^21.1.0",
     "mocha": "^2.2.5",
-    "necessary": "^1.0.9",
-    "occam-kahn": "^2.0.29",
     "ts-node": "^3.3.0",
     "typescript": "^2.5.2"
   },
