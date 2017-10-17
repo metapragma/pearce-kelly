@@ -10,7 +10,8 @@
     "url": "https://github.com/paerallax/directed-acyclic-graph"
   },
   "dependencies": {
-    "necessary": "^1.7.5"
+    "@types/lodash": "^4.14.77",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "@types/expect": "^1.20.1",
@@ -24,8 +25,9 @@
     "chokidar-cli": "^1.2.0",
     "expect": "^21.1.0",
     "mocha": "^2.2.5",
-    "necessary": "^1.0.9",
     "occam-kahn": "^2.0.29",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0",
     "ts-node": "^3.3.0",
     "typescript": "^2.5.2"
   },

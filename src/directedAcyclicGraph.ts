@@ -135,7 +135,7 @@ export default class DirectedAcyclicGraph {
     return cyclicVertexNames
   }
 
-  removeVertexByVertexName(vertexName: string) {
+  removeVertexByVertexName(vertexName: string): Edge[] {
     let removedEdges: Edge[] | null = null
 
     const vertexPresent = this.isVertexPresentByVertexName(vertexName)
