@@ -79,8 +79,38 @@ export const topologicallyOrderVertices = (vertices: IVertexState[]): IVertexSta
   return vertices
 }
 
-// export const validateEdgeByVertices = (sourceVertex: Vertex, targetVertex: Vertex): Vertex[] => {
-//   let cyclicVertices = null
+// export const validateEdgeByVertices(sourceVertex: Vertex, targetVertex: Vertex): Vertex[] {
+//     let cyclicVertices = null
+
+//     const forwardsAffectedVertices = targetVertex.getForwardsAffectedVertices(sourceVertex)
+//     const lastForwardsAffectedVertex = forwardsAffectedVertices[forwardsAffectedVertices.length - 1]
+//     const cyclePresent = (lastForwardsAffectedVertex === sourceVertex)
+
+//     if (cyclePresent) {
+//       cyclicVertices = forwardsAffectedVertices
+//     } else {
+//       const backwardsAffectedVertices = sourceVertex.getBackwardsAffectedVertices()
+
+//       topologicallyOrderVertices(backwardsAffectedVertices)
+
+//       topologicallyOrderVertices(forwardsAffectedVertices)
+
+//       const affectedVertices = [].concat(backwardsAffectedVertices).concat(forwardsAffectedVertices)
+//       const affectedVertexIndices = affectedVertices.map((affectedVertex) => {
+//         return affectedVertex.getIndex()
+//       })
+
+//       affectedVertexIndices.sort()
+
+//       affectedVertices.forEach((affectedVertex, index) => {
+//         const affectedVertexIndex = affectedVertexIndices[index]
+//         affectedVertex.setIndex(affectedVertexIndex)
+//       })
+//     }
+
+//     return cyclicVertices
+//   }
+
 // export const getPredecessorVertexMap: Selector<IVertexState, IVertexMap> = state => {
 //   let predecessorVertexMap: IVertexMap = {}
 //   state.immediatePredecessorVertices.forEach((vertex: Vertex) => {
