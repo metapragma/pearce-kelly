@@ -81,7 +81,25 @@ export const topologicallyOrderVertices = (vertices: IVertexState[]): IVertexSta
 
 // export const validateEdgeByVertices = (sourceVertex: Vertex, targetVertex: Vertex): Vertex[] => {
 //   let cyclicVertices = null
+// export const getPredecessorVertexMap: Selector<IVertexState, IVertexMap> = state => {
+//   let predecessorVertexMap: IVertexMap = {}
+//   state.immediatePredecessorVertices.forEach((vertex: Vertex) => {
+//     const predecessorVertexName = vertex.getName()
+//     predecessorVertexMap[predecessorVertexName] = vertex
+//   })
 
+//   return predecessorVertexMap
+// }
+
+// export const getSuccessorVertexMap: Selector<IVertexState, IVertexMap> = state => {
+//   let successorVertexMap: IVertexMap = {}
+//   state.immediateSuccessorVertices.forEach((vertex: Vertex) => {
+//     const successorVertexName = vertex.getName()
+//     successorVertexMap[successorVertexName] = vertex
+//   })
+
+//   return successorVertexMap
+// }
 //   const forwardsAffectedVertices = targetVertex.getForwardsAffectedVertices(sourceVertex)
 //   const lastForwardsAffectedVertex = forwardsAffectedVertices[forwardsAffectedVertices.length - 1]
 //   const cyclePresent = (lastForwardsAffectedVertex === sourceVertex)
@@ -154,13 +172,11 @@ export const unsetVertexByVertexName = (vertexName: string) => ({
   }
 })
 
-// TODO
 export const addVertexByVertexName = (vertexName: string):
-  ThunkAction<Vertex, IState, never> => (dispatch, getState) => {
+  ThunkAction<IVertexState, IState, never> => (dispatch, getState) => {
     const state = getState()
     const vertexPresent = isVertexPresentByVertexName(vertexName)(state)
 
-    // create vertex
     if (!vertexPresent) {
       const vertex = Vertex.fromNameAndIndex(vertexName, getVertexNames(state).length)
       dispatch(setVertexByVertexName(vertexName, vertex))
@@ -172,125 +188,108 @@ export const addVertexByVertexName = (vertexName: string):
   }
 
 // depends on BDFS and FDFS
-export const addEdgeByVertexNames = (sourceVertexName: string, targetVertexName: string):
-  ThunkAction<string[], IState, never> => (dispatch, getState) => {
-    let cyclicVertices = null
-    const state = getState()
+// export const addEdgeByVertexNames = (sourceVertexName: string, targetVertexName: string):
+//   ThunkAction<string[], IState, never> => (dispatch, getState) => {
+//     let cyclicVertices = null
+//     const state = getState()
 
-    if (sourceVertexName === targetVertexName) {
-      cyclicVertices = [getVertexByVertexName(sourceVertexName)(state)]
-    } else {
-      const sourceVertex = dispatch(addVertexByVertexName(sourceVertexName))
-      const targetVertex = dispatch(addVertexByVertexName(targetVertexName))
-      const edgePresent = sourceVertex.isEdgePresentByTargetVertex(targetVertex)
+//     if (sourceVertexName === targetVertexName) {
+//       cyclicVertices = [getVertexByVertexName(sourceVertexName)(state)]
+//     } else {
+//       const sourceVertex = dispatch(addVertexByVertexName(sourceVertexName))
+//       const targetVertex = dispatch(addVertexByVertexName(targetVertexName))
+//       const edgePresent = sourceVertex.isEdgePresentByTargetVertex(targetVertex)
 
-      if (!edgePresent) {
-        const sourceVertexIndex = sourceVertex.getIndex()
-        const targetVertexIndex = targetVertex.getIndex()
-        const invalidateEdge = (sourceVertexIndex > targetVertexIndex)
+//       if (!edgePresent) {
+//         const sourceVertexIndex = getIndex(sourceVertexName)(state)
+//         const targetVertexIndex = getIndex(targetVertexName)(state)
+//         const invalidateEdge = (sourceVertexIndex > targetVertexIndex)
 
-        if (invalidateEdge) {
-          cyclicVertices = validateEdgeByVertices(sourceVertex, targetVertex)
-        }
+//         if (invalidateEdge) {
+//           cyclicVertices = validateEdgeByVertices(sourceVertex, targetVertex)
+//         }
 
-        const cycleMissing = (cyclicVertices === null)
+//         const cycleMissing = (cyclicVertices === null)
 
-        if (cycleMissing) {
-          sourceVertex.addImmediateSuccessorVertex(targetVertex)
-          targetVertex.addImmediatePredecessorVertex(sourceVertex)
-        }
-      }
-    }
+//         if (cycleMissing) {
+//           addImmediateSuccessorVertex(sourceVertexName, targetVertex)
+//           addImmediatePredecessorVertex(sourceVertexName, sourceVertex)
+//         }
+//       }
+//     }
 
-    const cyclicVertexNames = (cyclicVertices !== null) ? vertexNamesFromVertices(cyclicVertices) : null
+//     const cyclicVertexNames = (cyclicVertices !== null) ? vertexNamesFromVertices(cyclicVertices) : null
 
-    return cyclicVertexNames
+//     return cyclicVertexNames
+//   }
+
+// export const addEdge = (edge: Edge): ThunkAction<string[], IState, never> => (dispatch) => {
+//   const sourceVertexName = edge.getSourceVertexName()
+//   const targetVertexName = edge.getTargetVertexName()
+//   const cyclicVertexNames = dispatch(addEdgeByVertexNames(sourceVertexName, targetVertexName))
+
+//   return cyclicVertexNames
+// }
+
+// TODO edge
+export interface IRemoveEdge {
+  type: 'REMOVE_EDGE',
+  payload: {
+    edge: Edge
   }
-
-export const addEdge = (edge: Edge): ThunkAction<string[], IState, never> => (dispatch) => {
-  const sourceVertexName = edge.getSourceVertexName()
-  const targetVertexName = edge.getTargetVertexName()
-  const cyclicVertexNames = dispatch(addEdgeByVertexNames(sourceVertexName, targetVertexName))
-
-  return cyclicVertexNames
 }
 
-// TODO: depends on removeEdgeByVertexNames()
-// export interface IRemoveEdge {
-//   type: 'REMOVE_EDGE',
-//   payload: {
-//     edge: Edge
-//   }
-// }
+export const removeEdge = (edge: Edge) => ({
+  type: 'REMOVE_EDGE',
+  payload: {
+    edge
+  }
+})
 
-// export const removeEdge = (edge: Edge) => ({
-//   type: 'REMOVE_EDGE',
-//   payload: {
-//     edge
-//   }
-// })
+export const removeEdgeByVertexNames = (sourceVertexName: string, targetVertexName: string):
+  ThunkAction<void, IState, never> => (dispatch, getState) => {
+    const state = getState()
+    const edgePresent = isEdgePresentByVertexNames(sourceVertexName, targetVertexName)(state)
 
-// TODO: depends on vertex reducer
-// export const removeEdgeByVertexNames = (sourceVertexName: string, targetVertexName: string):
-//   ThunkAction<void, IState, never> => (dispatch, getState) => {
-//     const state = getState()
-//     const edgePresent = isEdgePresentByVertexNames(sourceVertexName, targetVertexName)(state)
-//     if (edgePresent) {
-//       const sourceVertex = getVertexByVertexName(sourceVertexName)(state)
-//       const targetVertex = getVertexByVertexName(targetVertexName)(state)
-//       sourceVertex.removeImmediateSuccessorVertex(targetVertex)
-//       targetVertex.removeImmediatePredecessorVertex(sourceVertex)
-//     }
-//   }
+    if (edgePresent) {
+      const sourceVertex = getVertexByVertexName(sourceVertexName)(state)
+      const targetVertex = getVertexByVertexName(targetVertexName)(state)
+      dispatch(removeImmediateSuccessorVertex(sourceVertexName, targetVertex))
+      dispatch(removeImmediatePredecessorVertex(targetVertexName, sourceVertex))
+    }
+  }
 
-// TODO: depends on vertex internal methods
-// export const removeVertexByVertexName = (vertexName: string): 
-//   ThunkAction<Edge[], IState, never> => (dispatch, getState) => {
-//     const state = getState()
-//     let removedEdges: Edge[] | null = null
+export const removeVertexByVertexName = (vertexName: string): 
+  ThunkAction<void, IState, never> => (dispatch, getState) => {
+    const state = getState()
+    const vertexPresent = isVertexPresentByVertexName(vertexName)(state)
 
-//     const vertexPresent = this.isVertexPresentByVertexName(vertexName)
+    if (vertexPresent) {
+      dispatch(removeIncomingEdges(vertexName))
+      dispatch(removeOutgoingEdges(vertexName))
+      dispatch(unsetVertexByVertexName(vertexName))
+    }
+  }
 
-//     if (vertexPresent) {
-//       removedEdges = []
+export const removeEdgesBySourceVertexName = (sourceVertexName: string): 
+  ThunkAction<void, IState, never> => (dispatch, getState) => {
+    const state = getState()
+    const sourceVertexPresent = isVertexPresentByVertexName(sourceVertexName)(state)
 
-//       const vertex = this.getVertexByVertexName(vertexName)
+    if (sourceVertexPresent) {
+      dispatch(removeOutgoingEdges(sourceVertexName))
+    }
+}
 
-//       vertex.immediateSuccessorVertices.forEach((immediateSuccessorVertex) => {
-//         removedEdges.push(new Edge(vertex.getName(), immediateSuccessorVertex.getName()))
-//         immediateSuccessorVertex.removeImmediatePredecessorVertex(vertex)
-//       })
-//       vertex.immediatePredecessorVertices.forEach((immediatePredecessorVertex) => {
-//         removedEdges.push(new Edge(immediatePredecessorVertex.getName(), vertex.getName()))
-//         immediatePredecessorVertex.removeImmediateSuccessorVertex(vertex)
-//       })
-//       this.unsetVertexByVertexName(vertexName)
-//     }
+export const removeEdgesByTargetVertexName = (targetVertexName: string): 
+  ThunkAction<void, IState, never> => (dispatch, getState) => {
+    const state = getState()
+    const sourceVertexPresent = isVertexPresentByVertexName(targetVertexName)(state)
 
-//     return removedEdges
-//   }
-
-// TODO: depends on vertex internal method
-// export const removeEdgesBySourceVertexName = (sourceVertexName: string): 
-//   ThunkAction<void, IState, never> => (dispatch, getState) => {
-//     const state = getState()
-//     const sourceVertexPresent = isVertexPresentByVertexName(sourceVertexName)(state)
-
-//     if (sourceVertexPresent) {
-//       getVertexByVertexName(sourceVertexName)(state).removeOutgoingEdges()
-//     }
-// }
-
-// TODO: depends on vertex internal method
-// export const removeEdgesByTargetVertexName = (targetVertexName: string): 
-//   ThunkAction<void, IState, never> => (dispatch, getState) => {
-//     const state = getState()
-//     const sourceVertexPresent = isVertexPresentByVertexName(targetVertexName)(state)
-
-//     if (sourceVertexPresent) {
-//       getVertexByVertexName(targetVertexName)(state).removeIncomingEdges()
-//     }
-// }
+    if (sourceVertexPresent) {
+      dispatch(removeIncomingEdges(targetVertexName))
+    }
+}
 
 export type IAction = ISetVertexByVertexName | IUnsetVertexByVertexName |
                       ISetVertexName | ISetVertexIndex | ISetVertexVisited | 
@@ -466,26 +465,6 @@ export const getImmediatePredecessorVertices = (vertexName: string): Selector<IS
 export const getImmediateSuccessorVertices = (vertexName: string): Selector<IState, IVertexState[]> => 
   state => state.vertexMap[vertexName].immediateSuccessorVertices
 
-// export const getPredecessorVertexMap: Selector<IVertexState, IVertexMap> = state => {
-//   let predecessorVertexMap: IVertexMap = {}
-//   state.immediatePredecessorVertices.forEach((vertex: Vertex) => {
-//     const predecessorVertexName = vertex.getName()
-//     predecessorVertexMap[predecessorVertexName] = vertex
-//   })
-
-//   return predecessorVertexMap
-// }
-
-// export const getSuccessorVertexMap: Selector<IVertexState, IVertexMap> = state => {
-//   let successorVertexMap: IVertexMap = {}
-//   state.immediateSuccessorVertices.forEach((vertex: Vertex) => {
-//     const successorVertexName = vertex.getName()
-//     successorVertexMap[successorVertexName] = vertex
-//   })
-
-//   return successorVertexMap
-// }
-
 export const getPredecessorVertexNames = (vertex: IVertexState) => {
   let predecessorVertexNames: string[] = []
   vertex.immediatePredecessorVertices.forEach((vertex) => {
@@ -643,28 +622,26 @@ export const addImmediateSuccessorVertex = (vertexName: string, vertex: IVertexS
   }
 })
 
-export const removeIncomingEdges = ():
-  ThunkAction<void, IVertexState, never> => (dispatch, getState) => {
+export const removeIncomingEdges = (vertexName: string):
+  ThunkAction<void, IState, never> => (dispatch, getState) => {
     const state = getState()
-    const immediateSuccessorVertex = state
-    
-    state.immediatePredecessorVertices.forEach((immediatePredecessorVertex) => {
-      dispatch(removeImmediateSuccessorVertex(immediatePredecessorVertex))
+
+    state.vertexMap[vertexName].immediatePredecessorVertices.forEach((vertex) => {
+      dispatch(removeImmediateSuccessorVertex(vertexName, vertex))
     })
 
-    dispatch(removeAllImmediatePredecessorVertices)
+    dispatch(removeAllImmediatePredecessorVertices(vertexName))
   }
 
-export const removeOutgoingEdges = ():
-  ThunkAction<void, IVertexState, never> => (dispatch, getState) => {
+export const removeOutgoingEdges = (vertexName: string):
+  ThunkAction<void, IState, never> => (dispatch, getState) => {
     const state = getState()
-    const immediatePredecessorVertex = state
-    
-    state.immediateSuccessorVertices.forEach((immediateSuccessorVertex) => {
-      dispatch(removeImmediatePredecessorVertex(immediateSuccessorVertex))
+
+    state.vertexMap[vertexName].immediateSuccessorVertices.forEach((vertex) => {
+      dispatch(removeImmediatePredecessorVertex(vertexName, vertex))
     })
 
-    dispatch(removeAllImmediateSuccessorVertices)
+    dispatch(removeAllImmediateSuccessorVertices(vertexName))
   }
 
 export interface IRemoveAllImmediatePredecessorVertices {
