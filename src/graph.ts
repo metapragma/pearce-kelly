@@ -36,6 +36,7 @@ export const getVertexByVertexName = (vertexName: string): Selector<IState, IVer
     }
   }
 
+// TODO review
 export const isEdgePresentByVertexNames = (sourceVertexName: string, targetVertexName: string):
   Selector<IState, boolean> =>
   state => {
@@ -49,8 +50,8 @@ export const isEdgePresentByVertexNames = (sourceVertexName: string, targetVerte
 
     if (sourceVertexAndTargetVertexPresent) {
       edgePresent =
-        isVertexImmediateSuccessorVertex(sourceVertexName, targetVertex)(state) &&
-        isVertexImmediatePredecessorVertex(targetVertexName, sourceVertex)(state)
+        isVertexImmediateSuccessorVertex(sourceVertexName, targetVertexName)(state) &&
+        isVertexImmediatePredecessorVertex(targetVertexName, sourceVertexName)(state)
     }
 
     return edgePresent
@@ -59,11 +60,11 @@ export const isEdgePresentByVertexNames = (sourceVertexName: string, targetVerte
 export const isEdgePresent = (edge: Edge): Selector<IState, boolean> => state =>
   isEdgePresentByVertexNames(edge.getSourceVertexName(), edge.getTargetVertexName())(state)
 
-export const getPredecessorVertexNamesByVertexName = (vertexName: string): Selector<IState, string[]> =>
-  state => getPredecessorVertexNames(getVertexByVertexName(vertexName)(state))
+// export const getPredecessorVertexNamesByVertexName = (vertexName: string): Selector<IState, string[]> =>
+//   state => getPredecessorVertexNames(vertexName)(state)
 
-export const getSuccessorVertexNamesByVertexName = (vertexName: string): Selector<IState, string[]> =>
-  state => getSuccessorVertexNames(getVertexByVertexName(vertexName)(state))
+// export const getSuccessorVertexNamesByVertexName = (vertexName: string): Selector<IState, string[]> =>
+//   state => getSuccessorVertexNames(getVertexByVertexName(vertexName)(state))
 
 export const topologicallyOrderVertices = (vertices: IVertexState[]): IVertexState[] => {
   vertices.sort((firstVertex, secondVertex) => {
@@ -203,20 +204,20 @@ export const unsetVertexByVertexName = (vertexName: string) => ({
   }
 })
 
-export const addVertexByVertexName = (vertexName: string):
-  ThunkAction<IVertexState, IState, never> => (dispatch, getState) => {
-    const state = getState()
-    const vertexPresent = isVertexPresentByVertexName(vertexName)(state)
+// export const addVertexByVertexName = (vertexName: string):
+//   ThunkAction<IVertexState, IState, never> => (dispatch, getState) => {
+//     const state = getState()
+//     const vertexPresent = isVertexPresentByVertexName(vertexName)(state)
 
-    if (!vertexPresent) {
-      const vertex = Vertex.fromNameAndIndex(vertexName, getVertexNames(state).length)
-      dispatch(setVertexByVertexName(vertexName, vertex))
-    }
+//     if (!vertexPresent) {
+//       const vertex = Vertex.fromNameAndIndex(vertexName, getVertexNames(state).length)
+//       dispatch(setVertexByVertexName(vertexName, vertex))
+//     }
 
-    const vertex = getVertexByVertexName(vertexName)(state)
+//     const vertex = getVertexByVertexName(vertexName)(state)
 
-    return vertex
-  }
+//     return vertex
+//   }
 
 // depends on BDFS and FDFS
 // export const addEdgeByVertexNames = (sourceVertexName: string, targetVertexName: string):
@@ -283,10 +284,8 @@ export const removeEdgeByVertexNames = (sourceVertexName: string, targetVertexNa
     const edgePresent = isEdgePresentByVertexNames(sourceVertexName, targetVertexName)(state)
 
     if (edgePresent) {
-      const sourceVertex = getVertexByVertexName(sourceVertexName)(state)
-      const targetVertex = getVertexByVertexName(targetVertexName)(state)
-      dispatch(removeImmediateSuccessorVertex(sourceVertexName, targetVertex))
-      dispatch(removeImmediatePredecessorVertex(targetVertexName, sourceVertex))
+      dispatch(removeImmediateSuccessorVertex(sourceVertexName, targetVertexName))
+      dispatch(removeImmediatePredecessorVertex(targetVertexName, sourceVertexName))
     }
   }
 
@@ -341,13 +340,14 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
         }
       }
     case 'SET_VERTEX_NAME':
+      // this is done directly instead of returning new state
+      let swap = state.vertexMap[action.payload.currentName]
+      delete state.vertexMap[action.payload.currentName]
       return {
         ...state,
         vertexMap: {
           ...state.vertexMap,
-          [action.payload.newName]: {
-            ...state.vertexMap[action.payload.currentName]
-          }
+          [action.payload.newName]: swap
         }
       }
     case 'SET_VERTEX_INDEX':
@@ -373,6 +373,7 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
         }
       }
     case 'REMOVE_IMMEDIATE_PREDECESSOR_VERTEX':
+      
       return {
         ...state,
         vertexMap: {
@@ -381,7 +382,7 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
             ...state.vertexMap[action.payload.vertexName],
             immediatePredecessorVertices: remove(
               state.vertexMap[action.payload.vertexName].immediatePredecessorVertices,
-              action.payload.vertex
+              action.payload.vertexToRemove
             )
           }
         }
@@ -395,7 +396,7 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
             ...state.vertexMap[action.payload.vertexName],
             immediateSuccessorVertices: remove(
               state.vertexMap[action.payload.vertexName].immediateSuccessorVertices,
-              action.payload.vertex
+              action.payload.vertexToRemove
             )
           }
         }
@@ -505,57 +506,48 @@ export const getImmediatePredecessorVertices = (vertexName: string): Selector<IS
 export const getImmediateSuccessorVertices = (vertexName: string): Selector<IState, string[]> =>
   state => state.vertexMap[vertexName].immediateSuccessorVertices
 
-export const getPredecessorVertexNames = (vertex: IVertexState) => {
-  let predecessorVertexNames: string[] = []
-  vertex.immediatePredecessorVertices.forEach((vertex) => {
-    predecessorVertexNames.push(vertex.name)
-  })
-  return predecessorVertexNames
-}
-
-export const getSuccessorVertexNames = (vertex: IVertexState) => {
-  let successorVertexNames: string[] = []
-  vertex.immediateSuccessorVertices.forEach((vertex) => {
-    successorVertexNames.push(vertex.name)
-  })
-  return successorVertexNames
-}
-
-export const getPredecessorVertexMap(predecessorVertexMap: IVertexMap = {}) {
-  this.immediatePredecessorVertices.forEach((vertex: Vertex) => {
-    const predecessorVertexName = vertex.getName()
-    predecessorVertexMap[predecessorVertexName] = vertex
-
-    // predecessorVertex.getPredecessorVertices(predecessorVertexMap)
-  })
-
-  return predecessorVertexMap
-}
-
-export const getSuccessorVertexMap(successorVertexMap: IVertexMap = {}) {
-  this.immediateSuccessorVertices.forEach((vertex: Vertex) => {
-    const successorVertexName = vertex.getName()
-    successorVertexMap[successorVertexName] = vertex
-
-    // successorVertex.getSuccessorVertices(successorVertexMap)
-  })
-
-  return successorVertexMap
-}
-
-export const getPredecessorVertices = (vertexName: string): Selector<IState, IVertexState[]> =>
+export const getPredecessorVertexNames = (vertexName: string): Selector<IState, string[]> =>
   state => {
-    const allPredecessorVerticesNames: string[] = [...state.vertexMap[vertexName].immediatePredecessorVertices]
-    allPredecessorVerticesNames.forEach((vertexName) => {
-      allPredecessorVerticesNames.push(...state.vertexMap[vertexName].immediatePredecessorVertices)
+    const allPredecessorVertexNames: string[] = [...state.vertexMap[vertexName].immediatePredecessorVertices]
+    allPredecessorVertexNames.forEach((vertexName) => {
+      allPredecessorVertexNames.push(...state.vertexMap[vertexName].immediatePredecessorVertices)
       getPredecessorVertices(vertexName)
     })
-    const allPredecessorVertices = allPredecessorVerticesNames.map((vertexName) => state.vertexMap[vertexName])
-    return allPredecessorVertices
+    return allPredecessorVertexNames
   }
 
-export const getSuccessorVertices = (vertexName: string): Selector<IState, string[]> =>
-  state => state.vertexMap[vertexName].immediateSuccessorVertices
+export const getSuccessorVertexNames = (vertexName: string): Selector<IState, string[]> =>
+  state => {
+    const allSuccessorVertexNames: string[] = [...state.vertexMap[vertexName].immediateSuccessorVertices]
+    allSuccessorVertexNames.forEach((vertexName) => {
+      allSuccessorVertexNames.push(...state.vertexMap[vertexName].immediateSuccessorVertices)
+      getSuccessorVertices(vertexName)
+    })
+    return allSuccessorVertexNames
+  }
+
+// TODO: cleaner code
+export const getPredecessorVertices = (vertexName: string): Selector<IState, IVertexState[]> =>
+  state => {
+    const allPredecessorVertexNames: string[] = [...state.vertexMap[vertexName].immediatePredecessorVertices]
+    allPredecessorVertexNames.forEach((vertexName) => {
+      allPredecessorVertexNames.push(...state.vertexMap[vertexName].immediatePredecessorVertices)
+      getPredecessorVertices(vertexName)
+    })
+    const allPredecessorVertex = allPredecessorVertexNames.map((vertexName) => state.vertexMap[vertexName])
+    return allPredecessorVertex
+  }
+
+export const getSuccessorVertices = (vertexName: string): Selector<IState, IVertexState[]> =>
+  state => {
+    const allSuccessorVertexNames: string[] = [...state.vertexMap[vertexName].immediateSuccessorVertices]
+    allSuccessorVertexNames.forEach((vertexName) => {
+      allSuccessorVertexNames.push(...state.vertexMap[vertexName].immediateSuccessorVertices)
+      getSuccessorVertices(vertexName)
+    })
+    const allSuccessorVertex = allSuccessorVertexNames.map((vertexName) => state.vertexMap[vertexName])
+    return allSuccessorVertex
+  }
 
 export const getTopologicallyOrderedPredecessorVertexNames = (vertexName: string): Selector<IState, string[]> =>
   state => vertexNamesFromVertices(topologicallyOrderVertices(getPredecessorVertices(vertexName)(state)))
@@ -569,16 +561,16 @@ export const isVertexImmediateSuccessorVertex = (vertexName: string, vertexToLoo
 export interface ISetVertexName {
   type: 'SET_VERTEX_NAME',
   payload: {
-    newName: string,
-    currentName: string
+    currentName: string,
+    newName: string
   }
 }
 
-export const setVertexName = (newName: string, currentName: string): ISetVertexName => ({
+export const setVertexName = (currentName: string, newName: string): ISetVertexName => ({
   type: 'SET_VERTEX_NAME',
   payload: {
-    newName,
-    currentName
+    currentName,
+    newName
   }
 })
 
@@ -660,6 +652,8 @@ export const resetVisited = (vertexName: string): IResetVisited => ({
   }
 })
 
+// TODO: automatically add to successors meta
+// and check if it exists at all
 export interface IAddImmediatePredecessorVertex {
   type: 'ADD_IMMEDIATE_PREDECESSOR_VERTEX',
   payload: {
