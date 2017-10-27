@@ -23,7 +23,7 @@ export const getVertexValues: Selector<IState, IVertexState[]> = state =>
 export const getVertexNames: Selector<IState, string[]> = state => Object.keys(state.vertexMap)
 
 export const isEmpty: Selector<IState, boolean> = state => {
-  console.log(getVertexValues(state).length)
+  // console.log(getVertexValues(state).length)
   if (getVertexValues(state).length === 0) {
     return true
   } else {
@@ -381,9 +381,7 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
       }
     case 'REMOVE_IMMEDIATE_PREDECESSOR_VERTEX':
       const predecessorArrayToDiff = state.vertexMap[action.payload.vertexName].immediatePredecessorVertices
-      console.log(predecessorArrayToDiff)
       const predecessorRemoveIndex = predecessorArrayToDiff.indexOf(action.payload.vertexToRemove)
-      console.log(predecessorRemoveIndex)
       return {
         ...state,
         vertexMap: {
@@ -442,7 +440,7 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
         }
       }
     case 'RESET_VISITED':
-      console.log(state.vertexMap[action.payload.vertexName])
+      // console.log(state.vertexMap[action.payload.vertexName])
       return {
         ...state,
         vertexMap: {
