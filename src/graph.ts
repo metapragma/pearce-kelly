@@ -373,31 +373,36 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
         }
       }
     case 'REMOVE_IMMEDIATE_PREDECESSOR_VERTEX':
-      
+      const predecessorArrayToDiff = state.vertexMap[action.payload.vertexName].immediatePredecessorVertices
+      console.log(predecessorArrayToDiff)
+      const predecessorRemoveIndex = predecessorArrayToDiff.indexOf(action.payload.vertexToRemove)
+      console.log(predecessorRemoveIndex)
       return {
         ...state,
         vertexMap: {
           ...state.vertexMap,
           [action.payload.vertexName]: {
             ...state.vertexMap[action.payload.vertexName],
-            immediatePredecessorVertices: remove(
-              state.vertexMap[action.payload.vertexName].immediatePredecessorVertices,
-              action.payload.vertexToRemove
-            )
+            immediatePredecessorVertices: [
+              ...predecessorArrayToDiff.slice(0, predecessorRemoveIndex),
+              ...predecessorArrayToDiff.slice(predecessorRemoveIndex + 1)
+            ]
           }
         }
       }
     case 'REMOVE_IMMEDIATE_SUCCESSOR_VERTEX':
+      const successorArrayToDiff = state.vertexMap[action.payload.vertexName].immediateSuccessorVertices
+      const successorRemoveIndex = successorArrayToDiff.indexOf(action.payload.vertexToRemove)
       return {
         ...state,
         vertexMap: {
           ...state.vertexMap,
           [action.payload.vertexName]: {
             ...state.vertexMap[action.payload.vertexName],
-            immediateSuccessorVertices: remove(
-              state.vertexMap[action.payload.vertexName].immediateSuccessorVertices,
-              action.payload.vertexToRemove
-            )
+            immediateSuccessorVertices: [
+              ...successorArrayToDiff.slice(0, successorRemoveIndex),
+              ...successorArrayToDiff.slice(successorRemoveIndex + 1)
+            ]
           }
         }
       }
@@ -430,6 +435,7 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
         }
       }
     case 'RESET_VISITED':
+      console.log(state.vertexMap[action.payload.vertexName])
       return {
         ...state,
         vertexMap: {
