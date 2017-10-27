@@ -31,7 +31,15 @@ import {
   resetVisited,
   getVertexValues,
   getVertexNames,
-  isEmpty
+  isEmpty,
+  setVertexByVertexName,
+  unsetVertexByVertexName,
+  getVertexByVertexName,
+  isVertexPresentByVertexName,
+  removeIncomingEdges,
+  removeOutgoingEdges,
+  isEdgePresent,
+  isEdgePresentByVertexNames
 } from '../graph'
 
 import {
@@ -337,5 +345,105 @@ describe("graph", () => {
     store.dispatch(createVertex('v1', 1, false, [], []))
     store.dispatch(createVertex('v2', 2, false, [], []))
     expect(isEmpty(store.getState())).toEqual(false)
+  })
+
+  it("sets vertex by vertex name", () => {
+    // enforces type annotation on vertex
+    let store = createStore(reducer, applyMiddleware(thunk))
+    interface vertex {
+      name: string,
+      index: number,
+      visited: boolean,
+      immediatePredecessorVertices: string[],
+      immediateSuccessorVertices: string[]
+    }
+    let vertex: vertex = {
+      name: 'v1',
+      index: 1,
+      visited: false,
+      immediatePredecessorVertices: [],
+      immediateSuccessorVertices: []
+    }
+    expect(getVertexNames(store.getState())).toEqual([])
+    store.dispatch(setVertexByVertexName('v1', vertex))
+    expect(store.getState()).toEqual({
+      vertexMap: {
+        'v1': {
+          name: 'v1',
+          index: 1,
+          visited: false,
+          immediatePredecessorVertices: [],
+          immediateSuccessorVertices: []
+        }
+      }
+    })
+  })
+
+  it("unsets vertex by vertex name", () => {
+    let store = createStore(reducer, applyMiddleware(thunk))
+    store.dispatch(createVertex('v1', 1, false, [], []))
+    store.dispatch(createVertex('v2', 2, false, [], []))
+    expect(getVertexNames(store.getState())).toEqual(['v1', 'v2'])
+    store.dispatch(unsetVertexByVertexName('v1'))
+    expect(getVertexNames(store.getState())).toEqual(['v2'])
+  })
+
+  it("gets vertex by vertex name", () => {
+    let store = createStore(reducer, applyMiddleware(thunk))
+    store.dispatch(createVertex('v1', 1, false, [], []))
+    const state = store.getState()
+    expect(getVertexByVertexName('v1')(state)).toEqual({
+      name: 'v1',
+      index: 1,
+      visited: false,
+      immediatePredecessorVertices: [],
+      immediateSuccessorVertices: []
+    })
+  })
+
+  it("checks if vertex is present by its name", () => {
+    let store = createStore(reducer, applyMiddleware(thunk))
+    store.dispatch(createVertex('v1', 1, false, [], []))
+    const state = store.getState()
+    expect(isVertexPresentByVertexName('v1')(state)).toBe(true)
+  })
+
+  it("removes incoming edges of a vertex", () => {
+    let store = createStore(reducer, applyMiddleware(thunk))
+    store.dispatch(createVertex('v1', 1, false, [], []))
+    store.dispatch(createVertex('v2', 1, false, [], []))
+    store.dispatch(createVertex('v3', 1, false, [], []))
+    store.dispatch(createVertex('v4', 1, false, [], []))
+    store.dispatch(addImmediatePredecessorVertex('v1', 'v2'))
+    store.dispatch(addImmediatePredecessorVertex('v1', 'v3'))
+    store.dispatch(addImmediatePredecessorVertex('v1', 'v4'))
+    const state = store.getState()
+    expect(getImmediatePredecessorVertices('v1')(state)).toEqual(['v2', 'v3', 'v4'])
+    store.dispatch(removeIncomingEdges('v1'))
+    expect(getImmediatePredecessorVertices('v1')(store.getState())).toEqual([])
+  })
+
+    it("removes outgoing edges of a vertex", () => {
+    let store = createStore(reducer, applyMiddleware(thunk))
+    store.dispatch(createVertex('v1', 1, false, [], []))
+    store.dispatch(createVertex('v2', 1, false, [], []))
+    store.dispatch(createVertex('v3', 1, false, [], []))
+    store.dispatch(createVertex('v4', 1, false, [], []))
+    store.dispatch(addImmediateSuccessorVertex('v1', 'v2'))
+    store.dispatch(addImmediateSuccessorVertex('v1', 'v3'))
+    store.dispatch(addImmediateSuccessorVertex('v1', 'v4'))
+    const state = store.getState()
+    expect(getImmediateSuccessorVertices('v1')(state)).toEqual(['v2', 'v3', 'v4'])
+    store.dispatch(removeOutgoingEdges('v1'))
+    expect(getImmediateSuccessorVertices('v1')(store.getState())).toEqual([])
+  })
+
+   it("checks whether edge is present by vertex names", () => {
+    let store = createStore(reducer, applyMiddleware(thunk))
+    store.dispatch(createVertex('v1', 1, false, [], []))
+    store.dispatch(createVertex('v2', 2, false, [], []))
+    store.dispatch(addImmediatePredecessorVertex('v1', 'v2'))
+    const state = store.getState()
+    expect(isEdgePresentByVertexNames('v1', 'v2')(state)).toEqual(true)
   })
 })

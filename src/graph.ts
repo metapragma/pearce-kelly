@@ -43,22 +43,25 @@ export const getVertexByVertexName = (vertexName: string): Selector<IState, IVer
     }
   }
 
-// TODO review
+// TODO for this function to work correctly if a predecessor add event is fired
+// it should automatically update successor of 2nd vertex
 export const isEdgePresentByVertexNames = (sourceVertexName: string, targetVertexName: string):
   Selector<IState, boolean> =>
   state => {
     let edgePresent = false
 
-    const sourceVertex = getVertexByVertexName(sourceVertexName)(state)
-    const targetVertex = getVertexByVertexName(targetVertexName)(state)
     const sourceVertexAndTargetVertexPresent =
       getVertexByVertexName(sourceVertexName)(state) !== null &&
       getVertexByVertexName(targetVertexName)(state) !== null
 
     if (sourceVertexAndTargetVertexPresent) {
+     
       edgePresent =
-        isVertexImmediateSuccessorVertex(sourceVertexName, targetVertexName)(state) &&
-        isVertexImmediatePredecessorVertex(targetVertexName, sourceVertexName)(state)
+        (
+          isVertexImmediatePredecessorVertex(targetVertexName, sourceVertexName)(state)
+            || 
+          isVertexImmediatePredecessorVertex(sourceVertexName, targetVertexName)(state)
+        )
     }
 
     return edgePresent
@@ -66,12 +69,6 @@ export const isEdgePresentByVertexNames = (sourceVertexName: string, targetVerte
 
 export const isEdgePresent = (edge: Edge): Selector<IState, boolean> => state =>
   isEdgePresentByVertexNames(edge.getSourceVertexName(), edge.getTargetVertexName())(state)
-
-// export const getPredecessorVertexNamesByVertexName = (vertexName: string): Selector<IState, string[]> =>
-//   state => getPredecessorVertexNames(vertexName)(state)
-
-// export const getSuccessorVertexNamesByVertexName = (vertexName: string): Selector<IState, string[]> =>
-//   state => getSuccessorVertexNames(getVertexByVertexName(vertexName)(state))
 
 export const topologicallyOrderVertices = (vertices: IVertexState[]): IVertexState[] => {
   vertices.sort((firstVertex, secondVertex) => {
@@ -482,9 +479,14 @@ export const reducer = (state: IState = { vertexMap: {} }, action: IAction): ISt
         }
       }
     case 'UNSET_VERTEX_BY_VERTEX_NAME':
+     let modified = state.vertexMap
+     delete modified[action.payload.vertexName]
       return {
         ...state,
-        vertexMap: omit(state.vertexMap[action.payload.vertexName])
+        vertexMap: {
+          ...state.vertexMap,
+          ...modified
+        }
       }
     default:
       return state
