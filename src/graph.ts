@@ -22,7 +22,14 @@ export const getVertexValues: Selector<IState, IVertexState[]> = state =>
 
 export const getVertexNames: Selector<IState, string[]> = state => Object.keys(state.vertexMap)
 
-export const isEmpty: Selector<IState, boolean> = state => getVertexValues(state).length === 0
+export const isEmpty: Selector<IState, boolean> = state => {
+  console.log(getVertexValues(state).length)
+  if (getVertexValues(state).length === 0) {
+    return true
+  } else {
+    return false
+  }
+}
 
 export const isVertexPresentByVertexName = (vertexName: string): Selector<IState, boolean> =>
   state => getVertexNames(state).includes(vertexName)

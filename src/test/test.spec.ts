@@ -30,7 +30,8 @@ import {
   removeImmediateSuccessorVertex,
   resetVisited,
   getVertexValues,
-  getVertexNames
+  getVertexNames,
+  isEmpty
 } from '../graph'
 
 import {
@@ -324,11 +325,20 @@ describe("graph", () => {
     ])
   })
 
-  it("gets vertex values", () => {
+  it("gets vertex names", () => {
     let store = createStore(reducer, applyMiddleware(thunk))
     store.dispatch(createVertex('v1', 1, false, [], []))
     store.dispatch(createVertex('v2', 2, false, [], []))
     const state = store.getState()
     expect(getVertexNames(state)).toEqual(['v1', 'v2'])
+  })
+
+  it("checkes whether graph is empty", () => {
+    let store = createStore(reducer, applyMiddleware(thunk))
+    expect(isEmpty(store.getState())).toEqual(true)
+    store.dispatch(createVertex('v1', 1, false, [], []))
+    store.dispatch(createVertex('v2', 2, false, [], []))
+    console.log(store.getState())
+    expect(isEmpty(store.getState())).toEqual(false)
   })
 })
