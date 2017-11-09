@@ -85,6 +85,8 @@ export const topologicallyOrderVertices = (vertices: IVertexState[]): IVertexSta
   return vertices
 }
 
+// depends on getFAV
+
 // export const validateEdgeByVertices(sourceVertex: Vertex, targetVertex: Vertex): Vertex[] {
 //     let cyclicVertices = null
 
@@ -117,25 +119,6 @@ export const topologicallyOrderVertices = (vertices: IVertexState[]): IVertexSta
 //     return cyclicVertices
 //   }
 
-// export const getPredecessorVertexMap: Selector<IVertexState, IVertexMap> = state => {
-//   let predecessorVertexMap: IVertexMap = {}
-//   state.immediatePredecessorVertices.forEach((vertex: Vertex) => {
-//     const predecessorVertexName = vertex.getName()
-//     predecessorVertexMap[predecessorVertexName] = vertex
-//   })
-
-//   return predecessorVertexMap
-// }
-
-// export const getSuccessorVertexMap: Selector<IVertexState, IVertexMap> = state => {
-//   let successorVertexMap: IVertexMap = {}
-//   state.immediateSuccessorVertices.forEach((vertex: Vertex) => {
-//     const successorVertexName = vertex.getName()
-//     successorVertexMap[successorVertexName] = vertex
-//   })
-
-//   return successorVertexMap
-// }
 //   const forwardsAffectedVertices = targetVertex.getForwardsAffectedVertices(sourceVertex)
 //   const lastForwardsAffectedVertex = forwardsAffectedVertices[forwardsAffectedVertices.length - 1]
 //   const cyclePresent = (lastForwardsAffectedVertex === sourceVertex)
@@ -266,6 +249,117 @@ export const unsetVertexByVertexName = (vertexName: string) => ({
 
 //   return cyclicVertexNames
 // }
+
+
+
+
+
+// retrieveBackwardsAffectedVertices() {
+//   const backwardsAffectedVertices = this.backwardsDepthFirstSearch(function(visitedVertex) {
+//     const terminate = false
+    
+//     return terminate
+//   })
+  
+//   return backwardsAffectedVertices
+// }
+
+// retrieveBackwardsVisitedVertices(callback) {
+//   let terminate = false
+
+//   if (this.visited === false) {
+//     this.visited = true
+
+//     const visitedVertex = this  ///
+
+//     terminate = callback(visitedVertex)
+
+//     if (terminate !== true) {
+//       visitedVertex.someImmediatePredecessorVertex(function(immediatePredecessorVertex) {
+//         terminate = immediatePredecessorVertex.retrieveBackwardsVisitedVertices(callback)
+
+//         return terminate
+//       })
+//     }
+//   }
+
+//   return terminate
+// }
+
+// export const backwardsDepthFirstSearch(callback) => {
+//   const visitedVertices = []
+
+//   this.retrieveBackwardsVisitedVertices(function(visitedVertex) {
+//     const terminate = callback(visitedVertex)  ///
+
+//     visitedVertices.push(visitedVertex)
+
+//     return terminate
+//   })
+
+//   visitedVertices.forEach(function(visitedVertex) {
+//     visitedVertex.resetVisited()
+//   })
+
+//   return visitedVertices
+// }
+
+
+
+
+
+export const retrieveForwardsAffectedVertices = (sourceVertex: IVertexState): IVertexState[] => {
+  const forwardsAffectedVertices = forwardsDepthFirstSearch((visitedVertex: IVertexState) => {
+    const terminate = (visitedVertex === sourceVertex);
+    
+    return terminate;
+  });
+  
+  return forwardsAffectedVertices;
+}
+
+const retrieveForwardsVisitedVertices = (callback) => {
+  let terminate = false;
+
+  if (this.visited === false) {
+    this.visited = true;
+
+    const visitedVertex = this;  ///
+
+    terminate = callback(visitedVertex);
+
+    if (terminate !== true) {
+      visitedVertex.someImmediateSuccessorVertex(function(immediateSuccessorVertex) {
+        terminate = immediateSuccessorVertex.retrieveForwardsVisitedVertices(callback);
+
+        return terminate;
+      });
+    }
+  }
+
+  return terminate;
+}
+
+const forwardsDepthFirstSearch = (callback: (visitedVertex: IVertexState) => boolean): IVertexState[] => {
+  const visitedVertices: IVertexState[] = [];
+
+  retrieveForwardsVisitedVertices((visitedVertex: IVertexState) => {
+    const terminate = callback(visitedVertex);  ///
+
+    visitedVertices.push(visitedVertex);
+
+    return terminate;
+  });
+
+  // visitedVertices.forEach(function(visitedVertex) {
+  //   visitedVertex.resetVisited();
+  // });
+
+  return visitedVertices;
+}
+
+
+
 
 // TODO edge
 export interface IRemoveEdge {
