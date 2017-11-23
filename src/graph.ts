@@ -21,7 +21,8 @@ import {
   getPredecessorVertexNames,
   getSuccessorVertexNames,
   getPredecessorVertices,
-  getSuccessorVertices, vertexNamesFromVertices,
+  getSuccessorVertices, 
+  vertexNamesFromVertices,
   topologicallyOrderVertices,
   getTopologicallyOrderedVertexNames,
   getTopologicallyOrderedPredecessorVertexNames
@@ -40,13 +41,66 @@ import {
   resetVisited,
   removeAllImmediatePredecessorVertices,
   removeAllImmediateSuccessorVertices,
-  appendVertexToState
+  appendVertexToState,
+  createVertex,
+  removeEdgeByVertexNames,
+  removeVertexByVertexName,
+  removeEdgesBySourceVertexName,
+  removeEdgesByTargetVertexName,
+  removeIncomingEdges,
+  removeOutgoingEdges
 } from './actions'
 
 import {
   IAction,
   reducer
 } from './reducer'
+
+export {
+  getVertexValues,
+  getVertexNames,
+  isEmpty,
+  getVertexByVertexName,
+  isVertexPresentByVertexName,
+  isEdgePresentByVertexNames,
+  isVertexImmediatePredecessorVertex,
+  isVertexImmediateSuccessorVertex,
+  getName,
+  getIndex,
+  isVisited,
+  getImmediatePredecessorVertices,
+  getImmediateSuccessorVertices,
+  getPredecessorVertexNames,
+  getSuccessorVertexNames,
+  getPredecessorVertices,
+  getSuccessorVertices,
+  vertexNamesFromVertices,
+  topologicallyOrderVertices,
+  getTopologicallyOrderedVertexNames,
+  getTopologicallyOrderedPredecessorVertexNames,
+  setVertexByVertexName,
+  unsetVertexByVertexName,
+  setVertexName,
+  setVertexIndex,
+  setVertexVisited,
+  addImmediatePredecessorVertex,
+  addImmediateSuccessorVertex,
+  removeImmediatePredecessorVertex,
+  removeImmediateSuccessorVertex,
+  resetVisited,
+  removeAllImmediatePredecessorVertices,
+  removeAllImmediateSuccessorVertices,
+  appendVertexToState,
+  createVertex,
+  removeEdgeByVertexNames,
+  removeVertexByVertexName,
+  removeEdgesBySourceVertexName,
+  removeEdgesByTargetVertexName,
+  removeIncomingEdges,
+  removeOutgoingEdges,
+  IAction,
+  reducer
+}
 
 // TODO for this function to work correctly if a predecessor add event is fired
 // it should automatically update successor of 2nd vertex
