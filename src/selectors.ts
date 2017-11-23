@@ -1,18 +1,8 @@
-export type Selector<S, R> = (state: S) => R
-
-export interface IState {
-  vertexMap: {
-    [key: string]: IVertexState
-  }
-} 
-
-export interface IVertexState {
-  name: string,
-  index: number,
-  visited: boolean,
-  immediatePredecessorVertices: string[],
-  immediateSuccessorVertices: string[]
-}
+import {
+  Selector,
+  IState,
+  IVertexState
+} from './types'
 
 export const getVertexValues: Selector<IState, IVertexState[]> = state =>
   Object.keys(state.vertexMap).map(key => state.vertexMap[key])
@@ -118,4 +108,34 @@ export const getSuccessorVertices = (vertexName: string): Selector<IState, IVert
     const allSuccessorVertex = allSuccessorVertexNames.map((vertexName) => state.vertexMap[vertexName])
     return allSuccessorVertex
   } 
-  
+
+export const vertexNamesFromVertices = (vertices: IVertexState[]): string[] => {
+  const vertexNames = vertices.map((vertex) => {
+    const vertexName = vertex.name
+
+    return vertexName
+  })
+
+  return vertexNames
+}
+
+export const getTopologicallyOrderedVertexNames: Selector<IState, string[]> = state =>
+  vertexNamesFromVertices(topologicallyOrderVertices(getVertexValues(state)))
+
+export const topologicallyOrderVertices = (vertices: IVertexState[]): IVertexState[] => {
+  vertices.sort((firstVertex, secondVertex) => {
+    const firstVertexIndex = firstVertex.index
+    const secondVertexIndex = secondVertex.index
+
+    if (firstVertexIndex < secondVertexIndex) {
+      return -1
+    } else {
+      return +1
+    }
+  })
+
+  return vertices
+}
+
+export const getTopologicallyOrderedPredecessorVertexNames = (vertexName: string): Selector<IState, string[]> =>
+  state => vertexNamesFromVertices(topologicallyOrderVertices(getPredecessorVertices(vertexName)(state)))
