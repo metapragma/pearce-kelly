@@ -11,10 +11,11 @@ import {
   IRemoveImmediateSuccessorVertex,
   IAddImmediateSuccessorVertex,
   IResetVisited,
+  ISetVisitedTrue,
   IRemoveAllImmediatePredecessorVertices,
   IRemoveAllImmediateSuccessorVertices,
   IAppendVertexToState
-} from './types'
+} from '../types'
 
 import {
   isVertexPresentByVertexName,
@@ -96,6 +97,13 @@ export const addImmediateSuccessorVertex = (vertexName: string, vertexToAdd: str
 })
 
 export const resetVisited = (vertexName: string): IResetVisited => ({
+  type: 'RESET_VISITED',
+  payload: {
+    vertexName
+  }
+})
+
+export const setVisitedTrue = (vertexName: string): ISetVisitedTrue => ({
   type: 'RESET_VISITED',
   payload: {
     vertexName

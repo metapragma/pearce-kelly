@@ -39,12 +39,14 @@ import {
   removeIncomingEdges,
   removeOutgoingEdges,
   isEdgePresentByVertexNames
-} from '../graph'
+} from '../src/graph'
 
 import {
   remove,
   omit
 } from 'lodash'
+
+import graphSetup from './graphSetup'
 
 describe("graph", () => {
   it("creates a new vertex and appends it to global state", () => {
@@ -66,7 +68,7 @@ describe("graph", () => {
 
   it("gets the name of a vertex", () => {
     let store = createStore(reducer, applyMiddleware(thunk))
-    store.dispatch(createVertex('v1', 1, false, [], []))
+    store.dispatch(createVertex('v1', 1, false, [], [])) 
     const state = store.getState()
     expect(getName('v1')(state)).toEqual('v1')
   })
@@ -259,7 +261,6 @@ describe("graph", () => {
   //   expect(state.vertexMap['v1'].visited).toBe(true)
   // })
 
-
   it("removes immediate predecessor vertex", () => {
     let store = createStore(reducer, applyMiddleware(thunk))
     store.dispatch(createVertex('v1', 1, false, [], []))
@@ -423,7 +424,7 @@ describe("graph", () => {
     expect(getImmediatePredecessorVertices('v1')(store.getState())).toEqual([])
   })
 
-    it("removes outgoing edges of a vertex", () => {
+  it("removes outgoing edges of a vertex", () => {
     let store = createStore(reducer, applyMiddleware(thunk))
     store.dispatch(createVertex('v1', 1, false, [], []))
     store.dispatch(createVertex('v2', 1, false, [], []))
@@ -438,7 +439,7 @@ describe("graph", () => {
     expect(getImmediateSuccessorVertices('v1')(store.getState())).toEqual([])
   })
 
-   it("checks whether edge is present by vertex names", () => {
+  it("checks whether edge is present by vertex names", () => {
     let store = createStore(reducer, applyMiddleware(thunk))
     store.dispatch(createVertex('v1', 1, false, [], []))
     store.dispatch(createVertex('v2', 2, false, [], []))

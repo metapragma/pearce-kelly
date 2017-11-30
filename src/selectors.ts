@@ -2,7 +2,7 @@ import {
   Selector,
   IState,
   IVertexState
-} from './types'
+} from '../types'
 
 export const getVertexValues: Selector<IState, IVertexState[]> = state =>
   Object.keys(state.vertexMap).map(key => state.vertexMap[key])
@@ -14,14 +14,15 @@ export const isEmpty: Selector<IState, boolean> = state => getVertexValues(state
 export const getVertexByVertexName = (vertexName: string): Selector<IState, IVertexState | null> =>
   state => {
     if (isVertexPresentByVertexName(vertexName)(state) === true) {
-      return state.vertexMap[vertexName]
+      return state.vertexMap[vertexName]  
     } else {
       return null
     }
   }
 
+// Array.prototype.includes() is unknown to TS, henc indexOf()
 export const isVertexPresentByVertexName = (vertexName: string): Selector<IState, boolean> =>
-  state => getVertexNames(state).includes(vertexName)
+  state => getVertexNames(state).indexOf(vertexName) !== -1 ? true : false
 
 export const isEdgePresentByVertexNames = (sourceVertexName: string, targetVertexName: string):
   Selector<IState, boolean> =>
@@ -45,11 +46,13 @@ export const isEdgePresentByVertexNames = (sourceVertexName: string, targetVerte
     return edgePresent
   }
 
+// Array.prototype.includes() is unknown to TS, henc indexOf()
 export const isVertexImmediatePredecessorVertex = (vertexName: string, vertexToLookUp: string): Selector<IState, boolean> =>
-  state => state.vertexMap[vertexName].immediatePredecessorVertices.includes(vertexToLookUp)
+  state => state.vertexMap[vertexName].immediatePredecessorVertices.indexOf(vertexToLookUp) !== -1 ? true : false
 
+// Array.prototype.includes() is unknown to TS, henc indexOf()
 export const isVertexImmediateSuccessorVertex = (vertexName: string, vertexToLookUp: string): Selector<IState, boolean> =>
-  state => state.vertexMap[vertexName].immediateSuccessorVertices.includes(vertexToLookUp)
+  state => state.vertexMap[vertexName].immediateSuccessorVertices.indexOf(vertexToLookUp) !== -1 ? true : false
 
 export const getName = (vertexName: string): Selector<IState, string> =>
   state => state.vertexMap[vertexName].name

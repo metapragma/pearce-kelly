@@ -2,7 +2,7 @@ import {
   Selector,
   IState,
   IVertexState
-} from './types'
+} from '../types'
 
 import {
   getVertexValues,
@@ -101,6 +101,9 @@ export {
   IAction,
   reducer
 }
+
+import { createStore, applyMiddleware } from 'redux'
+import thunk, { ThunkAction } from 'redux-thunk' 
 
 // TODO for this function to work correctly if a predecessor add event is fired
 // it should automatically update successor of 2nd vertex
@@ -252,13 +255,13 @@ export {
 // }
 
 // retrieveBackwardsAffectedVertices() {
-//   const backwardsAffectedVertices = this.backwardsDepthFirstSearch(function(visitedVertex) {
+//   const backwardsAffectedVertices = this.backwardsDepthFirstSearch(function (visitedVertex) {
 //     const terminate = false
-    
+
 //     return terminate
 //   })
-  
-//   return backwardsAffectedVertices
+
+//   return backwardsAffectedVertices  
 // }
 
 // retrieveBackwardsVisitedVertices(callback) {
@@ -267,12 +270,12 @@ export {
 //   if (this.visited === false) {
 //     this.visited = true
 
-//     const visitedVertex = this  ///
+//     const visitedVertex = this  
 
 //     terminate = callback(visitedVertex)
 
 //     if (terminate !== true) {
-//       visitedVertex.someImmediatePredecessorVertex(function(immediatePredecessorVertex) {
+//       visitedVertex.someImmediatePredecessorVertex(function (immediatePredecessorVertex) {
 //         terminate = immediatePredecessorVertex.retrieveBackwardsVisitedVertices(callback)
 
 //         return terminate
@@ -283,10 +286,10 @@ export {
 //   return terminate
 // }
 
-// export const backwardsDepthFirstSearch(callback) => {
+// backwardsDepthFirstSearch(callback) {
 //   const visitedVertices = []
 
-//   this.retrieveBackwardsVisitedVertices(function(visitedVertex) {
+//   this.retrieveBackwardsVisitedVertices(function (visitedVertex) {
 //     const terminate = callback(visitedVertex)  ///
 
 //     visitedVertices.push(visitedVertex)
@@ -294,62 +297,104 @@ export {
 //     return terminate
 //   })
 
-//   visitedVertices.forEach(function(visitedVertex) {
+//   visitedVertices.forEach(function (visitedVertex) {
 //     visitedVertex.resetVisited()
 //   })
 
 //   return visitedVertices
 // }
 
+let store = createStore(reducer, applyMiddleware(thunk))
+const state = store.getState()
+
+export const retrieveBackwardsVisitedVertices = (vertexNameToLookup: string, callback: (vertexNameToLookup: string) => boolean): boolean => {
+  let terminate = false
+
+  if (isVisited(vertexNameToLookup)(state) === false) {
+    setVertexVisited(vertexNameToLookup, true)
+
+    const visitedVertex = vertexNameToLookup
+
+    terminate = callback(visitedVertex)
+
+    if (terminate !== true) {
+      state.vertexMap.vertexNameToLookup.immediatePredecessorVertices.some((immediatePredecessorVertex) => {
+        terminate = retrieveBackwardsVisitedVertices(immediatePredecessorVertex, callback)
+
+        return terminate
+      })
+    }
+  }
+
+  return terminate
+}
+
+export const backwardsDepthFirstSearch = (vertexNameToLookup: string): Array<string> => {
+  const visitedVertices: Array<string> = []
+
+  retrieveBackwardsVisitedVertices(vertexNameToLookup, (vertexNameToLookup) => {
+    const terminate = false  ///
+
+    visitedVertices.push(vertexNameToLookup)
+
+    return terminate
+  })
+
+  visitedVertices.forEach(function (visitedVertex) {
+    resetVisited(visitedVertex)
+  })
+
+  return visitedVertices
+}
 
 // export const retrieveForwardsAffectedVertices = (sourceVertex: IVertexState): IVertexState[] => {
 //   const forwardsAffectedVertices = forwardsDepthFirstSearch((visitedVertex: IVertexState) => {
-//     const terminate = (visitedVertex === sourceVertex);
+//     const terminate = (visitedVertex === sourceVertex)
     
-//     return terminate;
-//   });
+//     return terminate
+//   })
   
-//   return forwardsAffectedVertices;
+//   return forwardsAffectedVertices
 // }
 
 // const retrieveForwardsVisitedVertices = (callback) => {
-//   let terminate = false;
+//   let terminate = false
 
 //   if (this.visited === false) {
-//     this.visited = true;
+//     this.visited = true
 
-//     const visitedVertex = this;  ///
+//     const visitedVertex = this  ///
 
-//     terminate = callback(visitedVertex);
+//     terminate = callback(visitedVertex)
 
 //     if (terminate !== true) {
 //       visitedVertex.someImmediateSuccessorVertex(function(immediateSuccessorVertex) {
-//         terminate = immediateSuccessorVertex.retrieveForwardsVisitedVertices(callback);
+//         terminate = immediateSuccessorVertex.retrieveForwardsVisitedVertices(callback)
 
-//         return terminate;
-//       });
+//         return terminate
+//       })
 //     }
 //   }
 
-//   return terminate;
+//   return terminate
 // }
 
 // const forwardsDepthFirstSearch = (callback: (visitedVertex: IVertexState) => boolean): IVertexState[] => {
-//   const visitedVertices: IVertexState[] = [];
+//   const visitedVertices: IVertexState[] = []
 
 //   retrieveForwardsVisitedVertices((visitedVertex: IVertexState) => {
-//     const terminate = callback(visitedVertex);  ///
+//     const terminate = callback(visitedVertex)  ///
 
-//     visitedVertices.push(visitedVertex);
+//     visitedVertices.push(visitedVertex)
 
-//     return terminate;
-//   });
+//     return terminate
+//   })
 
   // visitedVertices.forEach(function(visitedVertex) {
-  //   visitedVertex.resetVisited();
-  // });
+  //   visitedVertex.resetVisited()
+  // })
 
-//   return visitedVertices;
+//   return visitedVertices
 // }
 
 // TODO edge

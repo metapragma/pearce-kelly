@@ -1,5 +1,3 @@
-import Edge from './edge'
-
 export type Selector<S, R> = (state: S) => R
 
 export interface IState {
@@ -28,13 +26,6 @@ export interface IUnsetVertexByVertexName {
   type: 'UNSET_VERTEX_BY_VERTEX_NAME',
   payload: {
     vertexName: string
-  }
-}
-
-export interface IRemoveEdge {
-  type: 'REMOVE_EDGE',
-  payload: {
-    edge: Edge
   }
 }
 
@@ -87,6 +78,13 @@ export interface IRemoveImmediateSuccessorVertex {
 }
 
 export interface IResetVisited {
+  type: 'RESET_VISITED',
+  payload: {
+    vertexName: string
+  }
+}
+
+export interface ISetVisitedTrue {
   type: 'RESET_VISITED',
   payload: {
     vertexName: string

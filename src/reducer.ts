@@ -13,7 +13,7 @@ import {
   IRemoveAllImmediatePredecessorVertices,
   IRemoveAllImmediateSuccessorVertices,
   IAppendVertexToState
-} from './types'
+} from '../types'
 
 export type IAction = ISetVertexByVertexName | IUnsetVertexByVertexName |
   ISetVertexName | ISetVertexIndex | ISetVertexVisited |
