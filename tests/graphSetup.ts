@@ -7,6 +7,7 @@ import {
   createVertex,
   addImmediatePredecessorVertex,
   addImmediateSuccessorVertex,
+  removeVertexByVertexName
 } from '../src/actions'
 import {
   getVertexNames
@@ -33,7 +34,7 @@ const graphSetup = (graphStore: Store<IState>) => {
   graphStore.dispatch(addImmediateSuccessorVertex('v1', 'v8'))
   graphStore.dispatch(addImmediateSuccessorVertex('v1', 'v9'))
   graphStore.dispatch(addImmediateSuccessorVertex('v2', 'v6'))
-  graphStore.dispatch(addImmediateSuccessorVertex('v4', 'v9'))
+  graphStore.dispatch(addImmediateSuccessorVertex('v5', 'v9'))
 }
 
 graphSetup(store)
@@ -41,7 +42,7 @@ graphSetup(store)
 const removeNodes = (store: Store<IState>) => {
   const vertexNames = getVertexNames(store.getState())
   for (let i = 0, l = vertexNames.length; i < l; i += 1) {
-    console.log(vertexNames[i])
+    store.dispatch(removeVertexByVertexName(vertexNames[i]))
   }
 }
 

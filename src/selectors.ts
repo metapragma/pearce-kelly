@@ -54,6 +54,7 @@ export const isVertexImmediatePredecessorVertex = (vertexName: string, vertexToL
 export const isVertexImmediateSuccessorVertex = (vertexName: string, vertexToLookUp: string): Selector<IState, boolean> =>
   state => state.vertexMap[vertexName].immediateSuccessorVertices.indexOf(vertexToLookUp) !== -1 ? true : false
 
+// TODO: error handling for getters
 export const getName = (vertexName: string): Selector<IState, string> =>
   state => state.vertexMap[vertexName].name
 
