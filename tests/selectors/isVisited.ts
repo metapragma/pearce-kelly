@@ -10,8 +10,8 @@ import { IState } from '../../types'
 import { Store } from 'redux'
 
 const changeVisited = (store: Store<IState>) => {
-  const state = store.getState()
-  for (let vertex in state.vertexMap) {
+  let state = store.getState()
+  for (const vertex in state.vertexMap) {
     store.dispatch(setVertexVisited(vertex, true))
   }
 }

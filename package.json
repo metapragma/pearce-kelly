@@ -30,6 +30,6 @@
     "typescript": "^2.5.2"
   },
   "scripts": {
-    "watch": "mocha --compilers ts:ts-node/register watch tests/selectors/getImmediateSuccessorVertices.ts"
+    "watch": "mocha --compilers ts:ts-node/register watch tests/selectors/isVertexImmediateSuccessorVertex.ts"
   }
 }
