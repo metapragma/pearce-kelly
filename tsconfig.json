@@ -11,7 +11,7 @@
     "downlevelIteration": true,
     "noUnusedParameters": true,
     "outDir": "lib",
-    "rootDir": "src",
+    "rootDir": "/",
     "suppressImplicitAnyIndexErrors": true,
     "target": "es5",
     "baseUrl": "src/types",

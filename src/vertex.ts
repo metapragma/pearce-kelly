@@ -1,6 +1,6 @@
 'use strict'
 
-export const vertexNamesFromVertices = (vertices: Vertex[]) => {
+export const vertexNamesFromVertices = (vertices: Vertex[]): string[] => {
   const vertexNames = vertices.map((vertex) => {
     const vertexName = vertex.getName()
 
@@ -248,7 +248,7 @@ export class Vertex {
   removeIncomingEdges() {
     const immediateSuccessorVertex = this 
     
-    this.immediatePredecessorVertices.forEach(function(immediatePredecessorVertex) {
+    this.immediatePredecessorVertices.forEach((immediatePredecessorVertex) => {
       immediatePredecessorVertex.removeImmediateSuccessorVertex(immediateSuccessorVertex)
     })
 
@@ -258,7 +258,7 @@ export class Vertex {
   removeOutgoingEdges() {
     const immediatePredecessorVertex = this 
 
-    this.immediateSuccessorVertices.forEach(function(immediateSuccessorVertex) {
+    this.immediateSuccessorVertices.forEach((immediateSuccessorVertex) => {
       immediateSuccessorVertex.removeImmediateSuccessorVertex(immediatePredecessorVertex)
     })
 
